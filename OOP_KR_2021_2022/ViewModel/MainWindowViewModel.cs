@@ -43,6 +43,7 @@ namespace OOP_KR_2021_2022.ViewModel
             {
                 selectedContact = value;
                 OnPropertyChanged(nameof(SelectedContact));
+                if(TextSearch!= null) TextSearch=textSearch;
             }
         }
 
@@ -57,32 +58,21 @@ namespace OOP_KR_2021_2022.ViewModel
                 switch (selectedContact.Id)
                 {
                     case 1:
-                        Filter = delegate (object ul) {
-                            foreach (BookTableModel item in bookTable)
-                            {
-                                return item.Author == ul.ToString() && item.Name == ul.ToString();
-                            }
-                            return false;
+                        Filter = delegate (object ul)
+                        {
+                            return ((BookTableModel)(ul)).Author.ToUpper().Contains(textSearch.ToUpper()) || ((BookTableModel)(ul)).Name.ToUpper().Contains(textSearch.ToUpper());
                         };
                         CollectionViewSource.GetDefaultView(BookTable).Filter = Filter;
                         break;
                     case 2:
                         Filter = delegate (object ul) {
-                            foreach (BookTableModel item in bookTable)
-                            {
-                                return item.Author == ul.ToString();
-                            }
-                            return false;
+                            return ((BookTableModel)(ul)).Author.ToUpper().Contains(textSearch.ToUpper());
                         };
                         CollectionViewSource.GetDefaultView(BookTable).Filter = Filter;
                         break;
                     case 3:
                         Filter = delegate (object ul) {
-                            foreach (BookTableModel item in bookTable)
-                            {
-                                return item.Name.StartsWith(ul.ToString());
-                            }
-                            return false;
+                            return ((BookTableModel)(ul)).Name.ToUpper().Contains(textSearch.ToUpper());
                         };
                         CollectionViewSource.GetDefaultView(BookTable).Filter = Filter;
                         break;
@@ -139,6 +129,10 @@ namespace OOP_KR_2021_2022.ViewModel
             if (StartFilterModel() && StartBookTableModel())
             {
 
+            }
+            else
+            {
+                Application.Current.MainWindow.Close();
             }
         }
 

@@ -23,10 +23,10 @@ namespace OOP_KR_2021_2022.Model
         private int book_name;
         public int Book_name
         {
-            get => Book_name;
+            get => book_name;
             set
             {
-                Book_name = value;
+                book_name = value;
                 OnPropertyChanged(nameof(book_name));
             }
         }

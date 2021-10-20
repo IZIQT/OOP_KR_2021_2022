@@ -1,0 +1,184 @@
+﻿<Window x:Class="OOP_KR_2021_2022.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OOP_KR_2021_2022"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        xmlns:ViewModel="clr-namespace:OOP_KR_2021_2022.ViewModel"
+        Title="Разработка системы классов для обеспечения работы электронной библиотеки." Height="auto" Width="auto" MinHeight="900" MinWidth="1280">
+    <Window.DataContext>
+        <ViewModel:MainWindowViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="10"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="10"/>
+        </Grid.RowDefinitions>
+        <md:ColorZone Grid.ColumnSpan="3" Mode="PrimaryMid"  Grid.Row="0" Background="Red">
+            <StackPanel Orientation="Horizontal" md:RippleAssist.IsCentered="True">
+                <Menu Background="Red" Margin="2 2 2 5">
+                    <MenuItem Header="Меню" Margin="0 0 0 0" Foreground="Wheat">
+                        <MenuItem.Icon>
+                            <md:PackIcon Kind="Menu"/>
+                        </MenuItem.Icon>
+                        <MenuItem Header="Добавить книгу" Command="{Binding OrderBookCommand}" />
+                        <MenuItem Header="Книгохранилище" Command="{Binding BookDepositoryCommand}" />
+                        <MenuItem Header="Учет клиентов" Command="{Binding AccountingClientsCommand}" />
+                    </MenuItem>
+                </Menu>
+                <md:ColorZone Mode="Dark"
+                              MinWidth="350"
+                              Padding="5 4 8 4"
+                              CornerRadius="2"
+                              Panel.ZIndex="1"
+                              Margin="0 2 0 0"
+                              md:ShadowAssist.ShadowDepth="Depth1"
+                              Background="White">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="69*"/>
+                        <ColumnDefinition Width="200*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Style="{DynamicResource MaterialDesignToolButton}" Margin="0,0,0,1">
+                        <md:PackIcon Kind="Magnify" Opacity=".56"/>
+                    </Button>
+
+                    <TextBox IsEnabled="True"
+                             Name="txtSearch"
+                             Grid.Column="1"
+                             Text="{Binding TextSearch, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="8,4,0,3"
+                             md:HintAssist.Hint="Поиск"
+                             md:TextFieldAssist.DecorationVisibility="Hidden"
+                             BorderThickness="0"
+                             MinWidth="200"
+                             
+                             VerticalAlignment="Center"
+                             Grid.ColumnSpan="2"
+                             Foreground="Black">
+                    </TextBox>
+                        <!--TextChanged="textSearch_textChanged"-->
+                        <ComboBox Name="cbFilter"
+                              ItemsSource="{Binding Filter_model}" 
+                              DisplayMemberPath="Name"
+                              SelectedItem="{Binding SelectedContact}"
+                              SelectedValue="Id"
+                              IsSynchronizedWithCurrentItem="True"
+                              Grid.Column="2"
+                              Foreground="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}"
+                              HorizontalAlignment="Right"
+                              FontSize="14" Background="White" Margin="0,2"/>
+
+                </Grid>
+                </md:ColorZone>
+            </StackPanel>
+        </md:ColorZone>
+
+        <Grid Grid.Row="1" Grid.Column="1" Visibility="{Binding GridAddBook, Converter={StaticResource BoolToVis}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="10"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="10"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Text="Введите необходимые данные для добавления книги"/>
+            <TextBlock Grid.Column="1" Grid.Row="2" TextAlignment="Center" Text="Автор: "/>
+            <TextBlock Grid.Column="1" Grid.Row="3" TextAlignment="Center" Text="Название: "/>
+            <TextBlock Grid.Column="1" Grid.Row="4" TextAlignment="Center" Text="Издательство: "/>
+            <TextBlock Grid.Column="1" Grid.Row="5" TextAlignment="Center" Text="Год издания: "/>
+            <TextBlock Grid.Column="1" Grid.Row="6" TextAlignment="Center" Text="Кол. страниц: "/>
+
+            <TextBox Grid.Column="2" Grid.Row="2" Text="{Binding TBAuthor}"/>
+            <TextBox Grid.Column="2" Grid.Row="3" Text="{Binding TBName}"/>
+            <TextBox Grid.Column="2" Grid.Row="4" Text="{Binding TBPublishing_house}"/>
+            <TextBox Grid.Column="2" Grid.Row="5" Text="{Binding TBYear_publishing}"/>
+            <TextBox Grid.Column="2" Grid.Row="6" Text="{Binding TBCountPage}"/>
+
+            <Button Grid.Column="1" Grid.Row="8" Grid.ColumnSpan="2" Content="Добавить книгу" Command="{Binding AddBook}"/>
+            <TextBlock Grid.Column="1" Grid.Row="10" Grid.ColumnSpan="2" Text="{Binding ErrorText}" TextAlignment="Center" TextWrapping="Wrap" FontSize="21" Foreground="Red"/>
+        </Grid>
+        
+        <DataGrid Grid.Row="1" Grid.Column="1" x:Name="BookGrid"
+                  ItemsSource="{Binding BookTable}" 
+                  SelectedItem="{Binding SelectedBook}"
+                  Grid.ColumnSpan="2"
+                  EnableRowVirtualization="True"
+                  SelectionMode="Single"
+                  SelectionUnit="FullRow"
+                  AutoGenerateColumns="False"
+                  CanUserReorderColumns="False"
+                  CanUserResizeRows="False"
+                  IsReadOnly="True"
+                  GridLinesVisibility="None"
+                  Visibility="{Binding BookTableVisibility, Converter={StaticResource BoolToVis}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  IsSynchronizedWithCurrentItem="True">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Отчет о книге" Command="{Binding CreateBookReportCommand}" CommandParameter="{Binding SelectedBook}"/>
+                    <MenuItem Header="Отчет о книгах" Command="{Binding CreateBooksReportCommand}"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
+                <DataGridTextColumn Header="Автор" Binding="{Binding Author}"/>
+                <DataGridTextColumn Header="Название" Binding="{Binding Name}"/>
+                <DataGridTextColumn Header="Издательство" Binding="{Binding Publishing_house}"/>
+                <DataGridTextColumn Header="Год издания" Binding="{Binding Year_publishing}"/>
+                <DataGridTextColumn Header="Кол. стр." Binding="{Binding CountPage}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <DataGrid Grid.Row="1" Grid.Column="1"
+                  ItemsSource="{Binding UserTable}" 
+                  Grid.ColumnSpan="2"
+                  EnableRowVirtualization="True"
+                  SelectionMode="Single"
+                  SelectionUnit="FullRow"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  IsReadOnly="True"
+                  Visibility="{Binding UserTableVisibility, Converter={StaticResource BoolToVis}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  IsSynchronizedWithCurrentItem="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Имя" Binding="{Binding Name}"/>
+                <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname}"/>
+                <DataGridTextColumn Header="Отчество" Binding="{Binding Patronymic}"/>
+                <DataGridTextColumn Header="Адрес проживания" Binding="{Binding Adress}"/>
+                <DataGridTextColumn Header="№ телефона" Binding="{Binding Phone}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

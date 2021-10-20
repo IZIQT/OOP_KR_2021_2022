@@ -15,8 +15,8 @@ namespace OOP_KR_2021_2022.Model
             }
         }
 
-        private int name;
-        public int Name
+        private string name;
+        public string Name
         {
             get => name;
             set
@@ -29,8 +29,8 @@ namespace OOP_KR_2021_2022.Model
         /// <summary>
         /// Фамилия
         /// </summary>
-        private int surname;
-        public int Surname
+        private string surname;
+        public string Surname
         {
             get => surname;
             set
@@ -43,8 +43,8 @@ namespace OOP_KR_2021_2022.Model
         /// <summary>
         /// Отчество
         /// </summary>
-        private int patronymic;
-        public int Patronymic
+        private string patronymic;
+        public string Patronymic
         {
             get => patronymic;
             set
@@ -54,8 +54,8 @@ namespace OOP_KR_2021_2022.Model
             }
         }
 
-        private int adress;
-        public int Adress
+        private string adress;
+        public string Adress
         {
             get => adress;
             set
@@ -65,8 +65,8 @@ namespace OOP_KR_2021_2022.Model
             }
         }
 
-        private int phone;
-        public int Phone
+        private string phone;
+        public string Phone
         {
             get => phone;
             set

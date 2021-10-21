@@ -7,7 +7,7 @@
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         xmlns:ViewModel="clr-namespace:OOP_KR_2021_2022.ViewModel"
-        Title="Разработка системы классов для обеспечения работы электронной библиотеки." Height="auto" Width="auto" MinHeight="900" MinWidth="1280">
+        Title="Разработка системы классов для обеспечения работы библиотеки." Height="auto" Width="auto" MinHeight="900" MinWidth="1280">
     <Window.DataContext>
         <ViewModel:MainWindowViewModel/>
     </Window.DataContext>
@@ -35,6 +35,7 @@
                         <MenuItem Header="Добавить книгу" Command="{Binding OrderBookCommand}" />
                         <MenuItem Header="Книгохранилище" Command="{Binding BookDepositoryCommand}" />
                         <MenuItem Header="Учет клиентов" Command="{Binding AccountingClientsCommand}" />
+                        <MenuItem Header="Отчет о книгах" Command="{Binding CreateBooksReportCommand}"/>
                     </MenuItem>
                 </Menu>
                 <md:ColorZone Mode="Dark"
@@ -106,6 +107,7 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="30"/>
@@ -113,26 +115,28 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="10"/>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Text="Введите необходимые данные для добавления книги"/>
+            <TextBlock Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Text="Введите необходимые данные для добавления книг" FontSize="18"/>
             <TextBlock Grid.Column="1" Grid.Row="2" TextAlignment="Center" Text="Автор: "/>
             <TextBlock Grid.Column="1" Grid.Row="3" TextAlignment="Center" Text="Название: "/>
             <TextBlock Grid.Column="1" Grid.Row="4" TextAlignment="Center" Text="Издательство: "/>
             <TextBlock Grid.Column="1" Grid.Row="5" TextAlignment="Center" Text="Год издания: "/>
             <TextBlock Grid.Column="1" Grid.Row="6" TextAlignment="Center" Text="Кол. страниц: "/>
+            <TextBlock Grid.Column="1" Grid.Row="7" TextAlignment="Center" Text="Кол. экземпляров: "/>
 
             <TextBox Grid.Column="2" Grid.Row="2" Text="{Binding TBAuthor}"/>
             <TextBox Grid.Column="2" Grid.Row="3" Text="{Binding TBName}"/>
             <TextBox Grid.Column="2" Grid.Row="4" Text="{Binding TBPublishing_house}"/>
             <TextBox Grid.Column="2" Grid.Row="5" Text="{Binding TBYear_publishing}"/>
             <TextBox Grid.Column="2" Grid.Row="6" Text="{Binding TBCountPage}"/>
+            <TextBox Grid.Column="2" Grid.Row="7" Text="{Binding TBCountBook}"/>
 
-            <Button Grid.Column="1" Grid.Row="8" Grid.ColumnSpan="2" Content="Добавить книгу" Command="{Binding AddBook}"/>
-            <TextBlock Grid.Column="1" Grid.Row="10" Grid.ColumnSpan="2" Text="{Binding ErrorText}" TextAlignment="Center" TextWrapping="Wrap" FontSize="21" Foreground="Red"/>
+            <Button Grid.Column="1" Grid.Row="9" Grid.ColumnSpan="2" Content="Добавить книгу" Command="{Binding AddBook}"/>
+            <TextBlock Grid.Column="1" Grid.Row="11" Grid.ColumnSpan="2" Text="{Binding ErrorText}" TextAlignment="Center" TextWrapping="Wrap" FontSize="21" Foreground="Red"/>
         </Grid>
         
         <DataGrid Grid.Row="1" Grid.Column="1" x:Name="BookGrid"
                   ItemsSource="{Binding BookTable}" 
-                  SelectedItem="{Binding SelectedBook}"
+                  SelectedItem="{Binding SelectedBook, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                   Grid.ColumnSpan="2"
                   EnableRowVirtualization="True"
                   SelectionMode="Single"
@@ -147,7 +151,6 @@
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Отчет о книге" Command="{Binding CreateBookReportCommand}" CommandParameter="{Binding SelectedBook}"/>
-                    <MenuItem Header="Отчет о книгах" Command="{Binding CreateBooksReportCommand}"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>

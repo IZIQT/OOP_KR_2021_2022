@@ -165,6 +165,18 @@ namespace OOP_KR_2021_2022.ViewModel
             }
         }
 
+        private string tBCountBook;
+        public string TBCountBook
+        {
+            get => tBCountPage;
+            set
+            {
+                ErrorText = "";
+                tBCountBook = value;
+                OnPropertyChanged(nameof(TBCountBook));
+            }
+        }
+        
         private bool gridAddBook;
         public bool GridAddBook
         {
@@ -249,12 +261,17 @@ namespace OOP_KR_2021_2022.ViewModel
             asd.CreateBooksReport(BookTable);
         }
 
-        private bool BookTableContains(BookTableModel ContainsItem)
+        private bool BookTableContains(BookTableModel ContainsItem, out BookTableModel FindBook)
         {
             foreach (BookTableModel item in BookTable)
             {
-                if (ContainsItem.Id == item.Id && ContainsItem.Name == item.Name && ContainsItem.Publishing_house == item.Publishing_house && ContainsItem.Year_publishing == item.Year_publishing && ContainsItem.Author == item.Author) return true;
+                if (ContainsItem.Name == item.Name && ContainsItem.Publishing_house == item.Publishing_house && ContainsItem.Year_publishing == item.Year_publishing && ContainsItem.Author == item.Author)
+                {
+                    FindBook = item;
+                    return true;
+                }
             }
+            FindBook = null;
             return false;
         }
 
@@ -262,18 +279,29 @@ namespace OOP_KR_2021_2022.ViewModel
         {
             if(BookTable != null)
             {
-                int temp1, temp2;
-                if(int.TryParse(tBCountPage, out temp1) && int.TryParse(tBYear_publishing, out temp2) && tBAuthor != "" && tBName != "" && tBPublishing_house != "" && tBCountPage != null && tBYear_publishing != null && tBAuthor != null && tBName != null && tBPublishing_house != null)
+                int _countPage, _tBYear_publishing, _countBook;
+                if(int.TryParse(tBCountPage, out _countPage) && int.TryParse(tBYear_publishing, out _tBYear_publishing) && tBAuthor != "" && tBName != "" && tBPublishing_house != "" && tBCountPage != null && tBYear_publishing != null && tBAuthor != null && tBName != null && tBPublishing_house != null && int.TryParse(tBCountBook, out _countBook))
                 {
                     int maxId = 0;
                     foreach (BookTableModel item in BookTable)
                     {
-                        if (item.Id > maxId) maxId = item.Id+1;
+                        if (item.Id >= maxId) maxId = item.Id+1;
                     }
-                    BookTableModel temp = new BookTableModel() {Id = maxId, Author = tBAuthor, Name = tBName, CountPage = temp1, Publishing_house = tBPublishing_house, Year_publishing = temp2 };
-                    if (BookTableContains(temp))
+                    BookTableModel temp = new BookTableModel() {Id = maxId, Author = tBAuthor, Name = tBName, CountPage = _countPage, Publishing_house = tBPublishing_house, Year_publishing = _tBYear_publishing, CountBook = _countBook };
+                    BookTableModel FindBook;
+                    if (BookTableContains(temp, out FindBook))
                     {
-                        ErrorText = "Данный элемент находиться в таблице";
+                        BookTableModel currentItem = BookTable.SingleOrDefault(x=>x == FindBook);
+                        //BookTable.SingleOrDefault(x => x == FindBook).CountBook = _countBook;
+                        temp.Id = currentItem.Id;
+                        temp.CountBook += _countBook;
+                        BookTable.Remove(FindBook);
+                        BookTable.Add(temp);
+                        bookTable.Add(new BookTableModel() { Id = 12 });
+                        //BookTable[BookTable.IndexOf(FindBook)] = new BookTableModel(temp);
+                        //BookTable.SingleOrDefault(x => x == FindBook) = new BookTableModel() { Id = currentItem.Id, Author = tBAuthor, Name = tBName, CountPage = _countPage, Publishing_house = tBPublishing_house, Year_publishing = _tBYear_publishing, CountBook = _countBook };
+                        OnPropertyChanged(nameof(BookTable));
+                        ErrorText = "Данный элемент находиться в таблице, добавляем количество экземпяров";
                         startTimer();
                     }
                     else
@@ -354,18 +382,18 @@ namespace OOP_KR_2021_2022.ViewModel
             try
             {
                 BookTable = new ObservableCollection<BookTableModel>();
-                BookTable.Add(new BookTableModel() { Id = 1, Author = "Анджей Сапковский", CountPage = 2800, Name = "Ведьмак", Publishing_house = "АТС", Year_publishing = 2020 });
-                BookTable.Add(new BookTableModel() { Id = 2, Author = "Рэй Брэдбери", CountPage = 320, Name = "Вино из одуванчиков", Publishing_house = "Эксмо-Пресс", Year_publishing = 2021 });
-                BookTable.Add(new BookTableModel() { Id = 3, Author = "Данте Алигьери", CountPage = 352, Name = "Божественная комедия", Publishing_house = "Речь", Year_publishing = 2018 });
-                BookTable.Add(new BookTableModel() { Id = 4, Author = "Джек Лондон", CountPage = 256, Name = "Алая чума", Publishing_house = "АТС", Year_publishing = 2016 });
-                BookTable.Add(new BookTableModel() { Id = 5, Author = "Джек Лондон", CountPage = 2800, Name = "Мартин Иден", Publishing_house = " Издательский дом Мещерякова", Year_publishing = 2018 });
-                BookTable.Add(new BookTableModel() { Id = 6, Author = "Джеффри Николас", CountPage = 352, Name = "Дюна", Publishing_house = "АТС", Year_publishing = 2021 });
-                BookTable.Add(new BookTableModel() { Id = 7, Author = "Эрик Берн", CountPage = 256, Name = "Игры, в которые играют люди", Publishing_house = "Бомбора", Year_publishing = 2017 });
-                BookTable.Add(new BookTableModel() { Id = 8, Author = "Антуан Сент-Экзюпери", CountPage = 160, Name = "Маленький принц", Publishing_house = "Эксмо", Year_publishing = 2011 });
-                BookTable.Add(new BookTableModel() { Id = 9, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 1", Publishing_house = "Речь", Year_publishing = 2017 });
-                BookTable.Add(new BookTableModel() { Id = 10, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 2", Publishing_house = "Речь", Year_publishing = 2017 });
-                BookTable.Add(new BookTableModel() { Id = 11, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 3", Publishing_house = "Речь", Year_publishing = 2017 });
-                BookTable.Add(new BookTableModel() { Id = 12, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 4", Publishing_house = "Речь", Year_publishing = 2017 });
+                BookTable.Add(new BookTableModel() { Id = 1, Author = "Анджей Сапковский", CountPage = 2800, Name = "Ведьмак", Publishing_house = "АТС", Year_publishing = 2020, CountBook = 30 });
+                BookTable.Add(new BookTableModel() { Id = 2, Author = "Рэй Брэдбери", CountPage = 320, Name = "Вино из одуванчиков", Publishing_house = "Эксмо-Пресс", Year_publishing = 2021, CountBook = 21 });
+                BookTable.Add(new BookTableModel() { Id = 3, Author = "Данте Алигьери", CountPage = 352, Name = "Божественная комедия", Publishing_house = "Речь", Year_publishing = 2018, CountBook = 15 });
+                BookTable.Add(new BookTableModel() { Id = 4, Author = "Джек Лондон", CountPage = 256, Name = "Алая чума", Publishing_house = "АТС", Year_publishing = 2016, CountBook = 27 });
+                BookTable.Add(new BookTableModel() { Id = 5, Author = "Джек Лондон", CountPage = 2800, Name = "Мартин Иден", Publishing_house = "Издательский дом Мещерякова", Year_publishing = 2018, CountBook = 41 });
+                BookTable.Add(new BookTableModel() { Id = 6, Author = "Джеффри Николас", CountPage = 352, Name = "Дюна", Publishing_house = "АТС", Year_publishing = 2021, CountBook = 4 });
+                BookTable.Add(new BookTableModel() { Id = 7, Author = "Эрик Берн", CountPage = 256, Name = "Игры, в которые играют люди", Publishing_house = "Бомбора", Year_publishing = 2017, CountBook = 13 });
+                BookTable.Add(new BookTableModel() { Id = 8, Author = "Антуан Сент-Экзюпери", CountPage = 160, Name = "Маленький принц", Publishing_house = "Эксмо", Year_publishing = 2011, CountBook = 24 });
+                BookTable.Add(new BookTableModel() { Id = 9, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 1", Publishing_house = "Речь", Year_publishing = 2017, CountBook = 20 });
+                BookTable.Add(new BookTableModel() { Id = 10, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 2", Publishing_house = "Речь", Year_publishing = 2017, CountBook = 20 });
+                BookTable.Add(new BookTableModel() { Id = 11, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 3", Publishing_house = "Речь", Year_publishing = 2017, CountBook = 20 });
+                BookTable.Add(new BookTableModel() { Id = 12, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 4", Publishing_house = "Речь", Year_publishing = 2017, CountBook = 20 });
                 return true;
             }
             catch (Exception exp)

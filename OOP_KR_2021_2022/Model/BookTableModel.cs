@@ -4,6 +4,22 @@ namespace OOP_KR_2021_2022.Model
 {
     class BookTableModel : ViewModelBase
     {
+        internal BookTableModel()
+        {
+
+        }
+
+        internal BookTableModel(BookTableModel unit)
+        {
+            Id = unit.Id;
+            Name = unit.Name;
+            Author = unit.Author;
+            Publishing_house = unit.Publishing_house;
+            Year_publishing = unit.Year_publishing;
+            CountPage = unit.CountPage;
+            CountBook = unit.CountBook;
+        }
+
         private int id;
         public int Id
         {
@@ -82,6 +98,20 @@ namespace OOP_KR_2021_2022.Model
             {
                 countPage = value;
                 OnPropertyChanged(nameof(CountPage));
+            }
+        }
+
+        private int countBook;
+        /// <summary>
+        /// Количество страниц
+        /// </summary>
+        public int CountBook
+        {
+            get => countBook;
+            set
+            {
+                countBook = value;
+                OnPropertyChanged(nameof(CountBook));
             }
         }
     }

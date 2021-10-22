@@ -3,6 +3,8 @@ using OOP_KR_2021_2022.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -233,6 +235,7 @@ namespace OOP_KR_2021_2022.ViewModel
             {
                 UserTableVisibility = false;
                 BookTableVisibility = false;
+                BookTable.CollectionChanged += ContentCollectionChanged;
                 GridAddBook = true;
                 //UserTableVisibility = false;
                 //BookTableVisibility = true;
@@ -247,6 +250,31 @@ namespace OOP_KR_2021_2022.ViewModel
             {
                 Application.Current.MainWindow.Close();
             }
+        }
+
+        public void ContentCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (BookTableModel item in e.OldItems)
+                {
+                    //Removed items
+                    item.PropertyChanged -= EntityViewModelPropertyChanged;
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (BookTableModel item in e.NewItems)
+                {
+                    //Added items
+                    item.PropertyChanged += EntityViewModelPropertyChanged;
+                }
+            }
+        }
+
+        public void EntityViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            //This will get called when the property of an object inside the collection changes
         }
 
         private void CreateBookReportCommandExecute(object obj)
@@ -296,11 +324,12 @@ namespace OOP_KR_2021_2022.ViewModel
                         temp.Id = currentItem.Id;
                         temp.CountBook += _countBook;
                         BookTable.Remove(FindBook);
-                        BookTable.Add(temp);
-                        bookTable.Add(new BookTableModel() { Id = 12 });
+                        BookTable.Add(new BookTableModel(FindBook));
+                        //BookTable.Add(temp);
+                        //bookTable.Add(new BookTableModel() { Id = 12 });
                         //BookTable[BookTable.IndexOf(FindBook)] = new BookTableModel(temp);
                         //BookTable.SingleOrDefault(x => x == FindBook) = new BookTableModel() { Id = currentItem.Id, Author = tBAuthor, Name = tBName, CountPage = _countPage, Publishing_house = tBPublishing_house, Year_publishing = _tBYear_publishing, CountBook = _countBook };
-                        OnPropertyChanged(nameof(BookTable));
+                        //OnPropertyChanged(nameof(BookTable));
                         ErrorText = "Данный элемент находиться в таблице, добавляем количество экземпяров";
                         startTimer();
                     }
@@ -319,6 +348,7 @@ namespace OOP_KR_2021_2022.ViewModel
                 
             }
         }
+
         System.Timers.Timer timer = new System.Timers.Timer();
 
         void startTimer()

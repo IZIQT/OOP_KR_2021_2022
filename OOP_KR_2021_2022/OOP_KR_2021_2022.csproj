@@ -72,6 +72,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Model\BookTableModel.cs" />
+    <Compile Include="Model\FileOperations.cs" />
     <Compile Include="Model\FilterModel.cs" />
     <Compile Include="Model\OrderTableModel.cs" />
     <Compile Include="Model\ReportClass.cs" />

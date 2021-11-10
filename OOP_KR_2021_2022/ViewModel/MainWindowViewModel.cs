@@ -1,4 +1,5 @@
-﻿using OOP_KR_2021_2022.Common.MVVM;
+﻿using Microsoft.Win32;
+using OOP_KR_2021_2022.Common.MVVM;
 using OOP_KR_2021_2022.Model;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace OOP_KR_2021_2022.ViewModel
 {
     class MainWindowViewModel : ViewModelBase
     {
+        private string FilePath { get; set; }
         private ObservableCollection<UserTableModel> userTable;
         public ObservableCollection<UserTableModel> UserTable
         {
@@ -229,6 +231,7 @@ namespace OOP_KR_2021_2022.ViewModel
         public ICommand AddBook { get; set; }
         public ICommand CreateBookReportCommand { get; set; }
         public ICommand CreateBooksReportCommand { get; set; }
+        public ICommand LoadingBookFromFileCommand { get; set; }
         public MainWindowViewModel()
         {
             if (StartFilter() && StartBookTable() && StartUserTable())
@@ -245,11 +248,45 @@ namespace OOP_KR_2021_2022.ViewModel
                 AddBook = new RelayCommand(AddBookExecute);
                 CreateBookReportCommand = new RelayCommand(CreateBookReportCommandExecute);
                 CreateBooksReportCommand = new RelayCommand(CreateBooksReportCommandExecute);
+                LoadingBookFromFileCommand = new RelayCommand(LoadingBookFromFileCommandExecute);
             }
             else
             {
                 Application.Current.MainWindow.Close();
             }
+        }
+
+        private bool OpenFileDialog()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.FileName = Environment.SystemDirectory;
+            openFileDialog.Filter = "Text documents (.txt)|*.txt";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                FilePath = openFileDialog.FileName;
+                return true;
+            }
+            return false;
+        }
+
+        private void LoadingBookFromFileCommandExecute(object obj)
+        {
+            FileOperations LBF = new FileOperations(BookTableCountID());
+            if (OpenFileDialog())
+            {
+                ObservableCollection<BookTableModel> temp = LBF.LoadingBookFromFile(FilePath);
+                foreach (BookTableModel item in temp)
+                {
+                    BookTableModel findName;
+                    BookTableContains(item, out findName);
+                    if (findName == null)
+                    {
+                        bookTable.Add(item);
+                    }
+
+                }
+            }
+
         }
 
         public void ContentCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -267,7 +304,7 @@ namespace OOP_KR_2021_2022.ViewModel
                 foreach (BookTableModel item in e.NewItems)
                 {
                     //Added items
-                    item.PropertyChanged += EntityViewModelPropertyChanged;
+                    if(item != null) item.PropertyChanged += EntityViewModelPropertyChanged;
                 }
             }
         }
@@ -275,6 +312,13 @@ namespace OOP_KR_2021_2022.ViewModel
         public void EntityViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             //This will get called when the property of an object inside the collection changes
+            var row = sender as BookTableModel;
+            SaveData(row);
+        }
+
+        private void SaveData(BookTableModel row)
+        {
+            //BookTable.Add(row);
         }
 
         private void CreateBookReportCommandExecute(object obj)
@@ -288,12 +332,17 @@ namespace OOP_KR_2021_2022.ViewModel
             ReportClass asd = new ReportClass();
             asd.CreateBooksReport(BookTable);
         }
-
+        /// <summary>
+        /// Поиск книги
+        /// </summary>
+        /// <param name="ContainsItem">искомый элемент</param>
+        /// <param name="FindBook">Найденая книга</param>
+        /// <returns></returns>
         private bool BookTableContains(BookTableModel ContainsItem, out BookTableModel FindBook)
         {
             foreach (BookTableModel item in BookTable)
             {
-                if (ContainsItem.Name == item.Name && ContainsItem.Publishing_house == item.Publishing_house && ContainsItem.Year_publishing == item.Year_publishing && ContainsItem.Author == item.Author)
+                if (ContainsItem.Name == item.Name && ContainsItem.Publishing_house == item.Publishing_house && ContainsItem.Year_publishing == item.Year_publishing && ContainsItem.Author == item.Author && ContainsItem.CountPage == item.CountPage)
                 {
                     FindBook = item;
                     return true;
@@ -303,6 +352,16 @@ namespace OOP_KR_2021_2022.ViewModel
             return false;
         }
 
+        public int BookTableCountID()
+        {
+            int maxId = 0;
+            foreach (BookTableModel item in BookTable)
+            {
+                if (item.Id >= maxId) maxId = item.Id + 1;
+            }
+            return maxId;
+        }
+
         private void AddBookExecute(object obj)
         {
             if(BookTable != null)
@@ -310,27 +369,23 @@ namespace OOP_KR_2021_2022.ViewModel
                 int _countPage, _tBYear_publishing, _countBook;
                 if(int.TryParse(tBCountPage, out _countPage) && int.TryParse(tBYear_publishing, out _tBYear_publishing) && tBAuthor != "" && tBName != "" && tBPublishing_house != "" && tBCountPage != null && tBYear_publishing != null && tBAuthor != null && tBName != null && tBPublishing_house != null && int.TryParse(tBCountBook, out _countBook))
                 {
-                    int maxId = 0;
-                    foreach (BookTableModel item in BookTable)
-                    {
-                        if (item.Id >= maxId) maxId = item.Id+1;
-                    }
-                    BookTableModel temp = new BookTableModel() {Id = maxId, Author = tBAuthor, Name = tBName, CountPage = _countPage, Publishing_house = tBPublishing_house, Year_publishing = _tBYear_publishing, CountBook = _countBook };
+                    
+                    BookTableModel temp = new BookTableModel() {Id = BookTableCountID(), Author = tBAuthor, Name = tBName, CountPage = _countPage, Publishing_house = tBPublishing_house, Year_publishing = _tBYear_publishing, CountBook = _countBook };
                     BookTableModel FindBook;
                     if (BookTableContains(temp, out FindBook))
                     {
-                        BookTableModel currentItem = BookTable.SingleOrDefault(x=>x == FindBook);
-                        //BookTable.SingleOrDefault(x => x == FindBook).CountBook = _countBook;
-                        temp.Id = currentItem.Id;
-                        temp.CountBook += _countBook;
+                        BookTableModel currentItem = BookTable.SingleOrDefault(x => x == FindBook);
+                        ////BookTable.SingleOrDefault(x => x == FindBook).CountBook = _countBook;
                         BookTable.Remove(FindBook);
-                        BookTable.Add(new BookTableModel(FindBook));
-                        //BookTable.Add(temp);
+                        temp.Id = currentItem.Id;
+                        temp.CountBook += FindBook.CountBook;
+                        //BookTable.Add(new BookTableModel(FindBook));
+                        BookTable.Add(temp);
                         //bookTable.Add(new BookTableModel() { Id = 12 });
                         //BookTable[BookTable.IndexOf(FindBook)] = new BookTableModel(temp);
                         //BookTable.SingleOrDefault(x => x == FindBook) = new BookTableModel() { Id = currentItem.Id, Author = tBAuthor, Name = tBName, CountPage = _countPage, Publishing_house = tBPublishing_house, Year_publishing = _tBYear_publishing, CountBook = _countBook };
                         //OnPropertyChanged(nameof(BookTable));
-                        ErrorText = "Данный элемент находиться в таблице, добавляем количество экземпяров";
+                        ErrorText = "Данный элемент находиться в таблице, добавлено количество экземпляров(с "+FindBook.CountBook+" на " + temp.CountBook+").";
                         startTimer();
                     }
                     else

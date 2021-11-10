@@ -36,6 +36,7 @@
                         <MenuItem Header="Книгохранилище" Command="{Binding BookDepositoryCommand}" />
                         <MenuItem Header="Учет клиентов" Command="{Binding AccountingClientsCommand}" />
                         <MenuItem Header="Отчет о книгах" Command="{Binding CreateBooksReportCommand}"/>
+                        <MenuItem Header="Загрузка книг из файла" Command="{Binding LoadingBookFromFileCommand}"/>
                     </MenuItem>
                 </Menu>
                 <md:ColorZone Mode="Dark"
@@ -144,7 +145,7 @@
                   AutoGenerateColumns="False"
                   CanUserReorderColumns="False"
                   CanUserResizeRows="False"
-                  IsReadOnly="True"
+                  
                   GridLinesVisibility="None"
                   Visibility="{Binding BookTableVisibility, Converter={StaticResource BoolToVis}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   IsSynchronizedWithCurrentItem="True">
@@ -160,6 +161,7 @@
                 <DataGridTextColumn Header="Издательство" Binding="{Binding Publishing_house}"/>
                 <DataGridTextColumn Header="Год издания" Binding="{Binding Year_publishing}"/>
                 <DataGridTextColumn Header="Кол. стр." Binding="{Binding CountPage}"/>
+                <DataGridTextColumn Header="Кол. экземпляров." Binding="{Binding CountBook}"/>
             </DataGrid.Columns>
         </DataGrid>
 

@@ -6,13 +6,17 @@
         xmlns:local="clr-namespace:OOP_KR_2021_2022"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:ViewModel="clr-namespace:OOP_KR_2021_2022.ViewModel"
+        xmlns:Converter="clr-namespace:OOP_KR_2021_2022.Common.Convertors"
         Title="Разработка системы классов для обеспечения работы библиотеки." Height="auto" Width="auto" MinHeight="900" MinWidth="1280">
     <Window.DataContext>
         <ViewModel:MainWindowViewModel/>
     </Window.DataContext>
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <ViewModel:MainWindowViewModel x:Key="XNameMainWindow"/>
+        <Converter:DefaultDateConverter x:Key="defDateConvert"/>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -32,9 +36,11 @@
                         <MenuItem.Icon>
                             <md:PackIcon Kind="Menu"/>
                         </MenuItem.Icon>
+                        <MenuItem Header="Книгохранилище" Command="{Binding BookDepositoryCommand}"/>
+                        <MenuItem Header="Имеющиеся книги" Command="{Binding BookDepositoryDistCommand}"/>
                         <MenuItem Header="Добавить книгу" Command="{Binding OrderBookCommand}" />
-                        <MenuItem Header="Книгохранилище" Command="{Binding BookDepositoryCommand}" />
-                        <MenuItem Header="Учет клиентов" Command="{Binding AccountingClientsCommand}" />
+                        <MenuItem Header="Учет читателей" Command="{Binding AccountingClientsCommand}" />
+                        <MenuItem Header="Добавить читателя" Command="{Binding OrderUserCommand}" />
                         <MenuItem Header="Отчет о книгах" Command="{Binding CreateBooksReportCommand}"/>
                         <MenuItem Header="Загрузка книг из файла" Command="{Binding LoadingBookFromFileCommand}"/>
                     </MenuItem>
@@ -62,7 +68,7 @@
                         <md:PackIcon Kind="Magnify" Opacity=".56"/>
                     </Button>
 
-                    <TextBox IsEnabled="True"
+                        <TextBox IsEnabled="True"
                              Name="txtSearch"
                              Grid.Column="1"
                              Text="{Binding TextSearch, UpdateSourceTrigger=PropertyChanged}"
@@ -75,8 +81,7 @@
                              VerticalAlignment="Center"
                              Grid.ColumnSpan="2"
                              Foreground="Black">
-                    </TextBox>
-                        <!--TextChanged="textSearch_textChanged"-->
+                        </TextBox>
                         <ComboBox Name="cbFilter"
                               ItemsSource="{Binding Filter_model}" 
                               DisplayMemberPath="Name"
@@ -86,7 +91,7 @@
                               Grid.Column="2"
                               Foreground="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}"
                               HorizontalAlignment="Right"
-                              FontSize="14" Background="White" Margin="0,2"/>
+                              FontSize="14" Background="White" Margin="0,0,0,3" VerticalAlignment="Bottom"/>
 
                 </Grid>
                 </md:ColorZone>
@@ -135,6 +140,46 @@
             <TextBlock Grid.Column="1" Grid.Row="11" Grid.ColumnSpan="2" Text="{Binding ErrorText}" TextAlignment="Center" TextWrapping="Wrap" FontSize="21" Foreground="Red"/>
         </Grid>
         
+        <Grid Grid.Row="1" Grid.Column="1" Visibility="{Binding GridAddUser, Converter={StaticResource BoolToVis}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="10"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="10"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Text="Введите необходимые данные для добавления пользователя" FontSize="18"/>
+            <TextBlock Grid.Column="1" Grid.Row="2" TextAlignment="Center" Text="Фамилия: "/>
+            <TextBlock Grid.Column="1" Grid.Row="3" TextAlignment="Center" Text="Имя: "/>
+            <TextBlock Grid.Column="1" Grid.Row="4" TextAlignment="Center" Text="Отчество: "/>
+            <TextBlock Grid.Column="1" Grid.Row="5" TextAlignment="Center" Text="Полный адресс: "/>
+            <TextBlock Grid.Column="1" Grid.Row="6" TextAlignment="Center" Text="Номер телефона: "/>
+
+            <TextBox Grid.Column="2" Grid.Row="2" Text="{Binding TBUSurname}"/>
+            <TextBox Grid.Column="2" Grid.Row="3" Text="{Binding TBUName}"/>
+            <TextBox Grid.Column="2" Grid.Row="4" Text="{Binding TBUPatronymic}"/>
+            <TextBox Grid.Column="2" Grid.Row="5" Text="{Binding TBUAdress}"/>
+            <TextBox Grid.Column="2" Grid.Row="6" Text="{Binding TBUPhone}"/>
+
+            <Button Grid.Column="1" Grid.Row="9" Grid.ColumnSpan="2" Content="Добавить читателя" Command="{Binding AddUser}"/>
+            <TextBlock Grid.Column="1" Grid.Row="11" Grid.ColumnSpan="2" Text="{Binding ErrorText}" TextAlignment="Center" TextWrapping="Wrap" FontSize="21" Foreground="Red"/>
+        </Grid>
+        
         <DataGrid Grid.Row="1" Grid.Column="1" x:Name="BookGrid"
                   ItemsSource="{Binding BookTable}" 
                   SelectedItem="{Binding SelectedBook, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -142,16 +187,120 @@
                   EnableRowVirtualization="True"
                   SelectionMode="Single"
                   SelectionUnit="FullRow"
+                  IsReadOnly="True"
                   AutoGenerateColumns="False"
                   CanUserReorderColumns="False"
                   CanUserResizeRows="False"
-                  
                   GridLinesVisibility="None"
                   Visibility="{Binding BookTableVisibility, Converter={StaticResource BoolToVis}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   IsSynchronizedWithCurrentItem="True">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding BookSelectedItemCommand}" CommandParameter="{Binding SelectedBook}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Отчет о книге" Command="{Binding CreateBookReportCommand}" CommandParameter="{Binding SelectedBook}"/>
+                    <MenuItem Header="Выдача книги читателю" Command="{Binding IssueOfABookCommand}" CommandParameter="{Binding SelectedBook}">
+                        <MenuItem>
+                            <MenuItem.Template>
+                                <ControlTemplate>
+                                    <StackPanel Margin="10 0 10 0" Orientation="Horizontal" DataContext="{StaticResource XNameMainWindow}">
+                                        <TextBlock Text="Выбирете пользователя: " VerticalAlignment="Center"/>
+                                        <ComboBox MinWidth="100" ItemsSource="{Binding UserTable}" VerticalAlignment="Center" SelectionChanged="ComboBox_SelectionChanged">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction Command="{Binding CMCBSelectedCommand}" CommandParameter="{Binding ElementName=BookGrid}"/>
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Id}"/>
+                                                        <TextBlock Text=" | "/>
+                                                        <TextBlock Text="{Binding Surname}"/>
+                                                        <TextBlock Text=" "/>
+                                                        <TextBlock Text="{Binding Name}"/>
+                                                        <TextBlock Text=" "/>
+                                                        <TextBlock Text="{Binding Patronymic}"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </ControlTemplate>
+                            </MenuItem.Template>
+                        </MenuItem>
+                    </MenuItem>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
+                <DataGridTextColumn Header="Автор" Binding="{Binding Author}"/>
+                <DataGridTextColumn Header="Название" Binding="{Binding Name}"/>
+                <DataGridTextColumn Header="Издательство" Binding="{Binding Publishing_house}"/>
+                <DataGridTextColumn Header="Год издания" Binding="{Binding Year_publishing}"/>
+                <DataGridTextColumn Header="Кол. стр." Binding="{Binding CountPage}"/>
+                <DataGridTextColumn Header="Дата выдачи" Binding="{Binding DateOfIssue, Converter={StaticResource defDateConvert}, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTextColumn Header="Должен сдать" Binding="{Binding DateOfDelivery, Converter={StaticResource defDateConvert}, UpdateSourceTrigger=PropertyChanged}"/>
+                <!--<DataGridTextColumn Header="Кол. экземпляров." Binding="{Binding CountBook}"/>-->
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <DataGrid Grid.Row="1" Grid.Column="1" x:Name="BookGridDist"
+                  ItemsSource="{Binding BookTableDist}" 
+                  SelectedItem="{Binding SelectedBookDist, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                  Grid.ColumnSpan="2"
+                  EnableRowVirtualization="True"
+                  SelectionMode="Single"
+                  SelectionUnit="FullRow"
+                  IsReadOnly="True"
+                  AutoGenerateColumns="False"
+                  CanUserReorderColumns="False"
+                  CanUserResizeRows="False"
+                  GridLinesVisibility="None"
+                  Visibility="{Binding BookTableDustVisibility, Converter={StaticResource BoolToVis}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  IsSynchronizedWithCurrentItem="True">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding BookSelectedItemCommand}" CommandParameter="{Binding SelectedBook}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Отчет о книге" Command="{Binding CreateBookReportCommand}" CommandParameter="{Binding SelectedBook}"/>
+                    <MenuItem Header="Выдача книги читателю" Command="{Binding IssueOfABookCommand}" CommandParameter="{Binding SelectedBook}">
+                        <MenuItem>
+                            <MenuItem.Template>
+                                <ControlTemplate>
+                                    <StackPanel Margin="10 0 10 0" Orientation="Horizontal" DataContext="{StaticResource XNameMainWindow}">
+                                        <TextBlock Text="Выбирете пользователя: " VerticalAlignment="Center"/>
+                                        <ComboBox MinWidth="100" ItemsSource="{Binding UserTable}" VerticalAlignment="Center" SelectionChanged="ComboBox_SelectionChanged">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction Command="{Binding CMCBSelectedCommand}" CommandParameter="{Binding SelectedBook}"/>
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Id}"/>
+                                                        <TextBlock Text=" | "/>
+                                                        <TextBlock Text="{Binding Surname}"/>
+                                                        <TextBlock Text=" "/>
+                                                        <TextBlock Text="{Binding Name}"/>
+                                                        <TextBlock Text=" "/>
+                                                        <TextBlock Text="{Binding Patronymic}"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </ControlTemplate>
+                            </MenuItem.Template>
+                        </MenuItem>
+                    </MenuItem>
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
@@ -164,7 +313,7 @@
                 <DataGridTextColumn Header="Кол. экземпляров." Binding="{Binding CountBook}"/>
             </DataGrid.Columns>
         </DataGrid>
-
+        
         <DataGrid Grid.Row="1" Grid.Column="1"
                   ItemsSource="{Binding UserTable}" 
                   Grid.ColumnSpan="2"

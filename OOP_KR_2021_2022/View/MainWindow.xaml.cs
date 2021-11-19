@@ -24,5 +24,15 @@ namespace OOP_KR_2021_2022
         {
             InitializeComponent();
         }
+
+        private void ComboBox_Selected(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }

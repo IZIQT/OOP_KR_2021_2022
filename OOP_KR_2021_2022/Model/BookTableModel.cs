@@ -1,4 +1,5 @@
 ﻿using OOP_KR_2021_2022.Common.MVVM;
+using System;
 
 namespace OOP_KR_2021_2022.Model
 {
@@ -17,7 +18,7 @@ namespace OOP_KR_2021_2022.Model
             Publishing_house = unit.Publishing_house;
             Year_publishing = unit.Year_publishing;
             CountPage = unit.CountPage;
-            CountBook = unit.CountBook;
+            //CountBook = unit.CountBook;
         }
 
         private int id;
@@ -101,18 +102,47 @@ namespace OOP_KR_2021_2022.Model
             }
         }
 
-        private int countBook;
+        //private int countBook;
+        ///// <summary>
+        ///// Количество книг
+        ///// </summary>
+        //public int CountBook
+        //{
+        //    get => countBook;
+        //    set
+        //    {
+        //        countBook = value;
+        //        OnPropertyChanged(nameof(CountBook));
+        //    }
+        //}
+
+        private DateTime dateOfIssue;
         /// <summary>
-        /// Количество страниц
+        /// Дата выдачи
         /// </summary>
-        public int CountBook
+        public DateTime DateOfIssue
         {
-            get => countBook;
+            get => dateOfIssue;
             set
             {
-                countBook = value;
-                OnPropertyChanged(nameof(CountBook));
+                dateOfIssue = value;
+                OnPropertyChanged(nameof(DateOfIssue));
             }
         }
+
+        private DateTime dateOfDelivery;
+        /// <summary>
+        /// Дата сдачи
+        /// </summary>
+        public DateTime DateOfDelivery
+        {
+            get => dateOfDelivery;
+            set
+            {
+                dateOfDelivery = value;
+                OnPropertyChanged(nameof(DateOfDelivery));
+            }
+        }
+
     }
 }

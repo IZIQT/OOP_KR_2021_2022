@@ -43,7 +43,7 @@ namespace OOP_KR_2021_2022.Model
                 Name = temp[2],
                 Publishing_house = temp[3],
                 Year_publishing = temp2,
-                CountBook = temp3
+                //CountBook = temp3
             };
             _booktableMaxId++;
             return currentItem;

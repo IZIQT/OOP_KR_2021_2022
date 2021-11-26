@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -18,6 +20,10 @@ namespace OOP_KR_2021_2022.ViewModel
 {
     class MainWindowViewModel : ViewModelBase
     {
+        static string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database1.mdf;Integrated Security=True";
+        SqlConnection connection = new SqlConnection(connectionString);
+        SqlDataAdapter adapter;
+
         private string FilePath { get; set; }
         private ObservableCollection<UserTableModel> userTable;
         public ObservableCollection<UserTableModel> UserTable
@@ -29,6 +35,29 @@ namespace OOP_KR_2021_2022.ViewModel
                 OnPropertyChanged(nameof(UserTable));
             }
         }
+
+        //private DataTable bookTable;
+        //public DataTable BookTable
+        //{
+        //    get => bookTable;
+        //    set
+        //    {
+        //        bookTable = value;
+        //        OnPropertyChanged(nameof(BookTable));
+        //    }
+        //}
+
+        //private DataTable bookTableDits;
+        //public DataTable BookTableDits
+        //{
+        //    get => bookTableDits;
+        //    set
+        //    {
+        //        bookTableDits = value;
+        //        OnPropertyChanged(nameof(BookTableDits));
+        //    }
+        //}
+
 
         private ObservableCollection<BookTableModel> bookTable;
         public ObservableCollection<BookTableModel> BookTable
@@ -341,10 +370,8 @@ namespace OOP_KR_2021_2022.ViewModel
                 GridAddBook = false;
                 gridAddUser = false;
                 
-                //UserTableVisibility = false;
-                //BookTableVisibility = true;
                 OrderBookCommand = new RelayCommand(OrderBookCommandExecute);
-                IssueOfABookCommand = new RelayCommand(IssueOfABookCommandExecute);
+                //IssueOfABookCommand = new RelayCommand(IssueOfABookCommandExecute);
                 OrderUserCommand = new RelayCommand(OrderUserCommandExecute);
                 BookDepositoryCommand = new RelayCommand(BookDepositoryCommandExecute);
                 BookDepositoryDistCommand = new RelayCommand(BookDepositoryDistCommandExecute);
@@ -355,7 +382,7 @@ namespace OOP_KR_2021_2022.ViewModel
                 CreateBooksReportCommand = new RelayCommand(CreateBooksReportCommandExecute);
                 LoadingBookFromFileCommand = new RelayCommand(LoadingBookFromFileCommandExecute);
                 CMCBSelectedCommand = new RelayCommand(CMCBSelectedCommandExecute);
-                BookSelectedItemCommand = new RelayCommand(BookSelectedItemCommandExecute);
+                //BookSelectedItemCommand = new RelayCommand(BookSelectedItemCommandExecute);
             }
             else
             {
@@ -363,15 +390,25 @@ namespace OOP_KR_2021_2022.ViewModel
             }
         }
 
-        private BookTableModel selectItem;
-        private void BookSelectedItemCommandExecute(object obj)
-        {
-            selectItem = obj as BookTableModel;
-            //throw new NotImplementedException();
-        }
+        //private BookTableModel selectItem;
+        //private void BookSelectedItemCommandExecute(object obj)
+        //{
+        //    selectItem = obj as BookTableModel;
+        //    //throw new NotImplementedException();
+        //}
 
         private void CMCBSelectedCommandExecute(object obj)
         {
+            (obj as BookTableModel).DateOfDelivery = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+            if (DateTime.Now.Month + 3 < 12)
+            {
+                (obj as BookTableModel).DateOfDelivery = new DateTime(DateTime.Now.Year, DateTime.Now.Month+3, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+            }
+            else
+            {
+                (obj as BookTableModel).DateOfIssue = new DateTime(DateTime.Now.Year+1, (DateTime.Now.Month + 3) % 12, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+            }
+            
             //throw new NotImplementedException();
         }
 
@@ -628,10 +665,11 @@ namespace OOP_KR_2021_2022.ViewModel
             GridAddUser = true;
         }
 
-        private void IssueOfABookCommandExecute(object obj)
-        {
-            //IssuingBooks.Add();
-        }
+        //private void IssueOfABookCommandExecute(object obj)
+        //{
+        //    //IssuingBooks.Add();
+        //}
+
         private bool StartFilter()
         {
             try
@@ -650,6 +688,34 @@ namespace OOP_KR_2021_2022.ViewModel
         }
         private bool StartBookTable()
         {
+
+            //try
+            //{
+            //    //EnableButtonExportCSV = false;
+            //    Task.Run(() =>
+            //    {
+            //        string sql = "SELECT * FROM DATA_TABLE";
+            //        BookTable = new DataTable();
+
+            //        SqlCommand command = new SqlCommand(sql, connection);
+            //        adapter = new SqlDataAdapter(command);
+
+            //        connection.Open();
+            //        adapter.Fill(BookTable);
+            //        OnPropertyChanged(nameof(BookTable));
+            //    });
+            //}
+            //catch (Exception exp)
+            //{
+            //    MessageBox.Show("Ошибка! \n\n" + exp, "Ошибка!");
+            //}
+            //finally
+            //{
+            //    //EnableButtonExportCSV = true;
+            //    if (connection != null)
+            //        connection.Close();
+            //}
+
             try
             {
                 BookTable = new ObservableCollection<BookTableModel>();
@@ -715,10 +781,12 @@ namespace OOP_KR_2021_2022.ViewModel
             try
             {
                 UserTable = new ObservableCollection<UserTableModel>();
-                UserTable.Add(new UserTableModel() { Id = 1, Name = "Василий", Surname = "Пупкин", Patronymic = "Валерьевич", Adress = "Г.Санкт-Петербург ул. Мира д.6 кв.23", Phone = "89535338532" });
-                UserTable.Add(new UserTableModel() { Id = 2, Name = "Сергей", Surname = "Инанопуло", Patronymic = "Сергеевич", Adress = "Г.Санкт-Петербург ул. Советская д.26 кв.213", Phone = "89535368332" });
-                UserTable.Add(new UserTableModel() { Id = 3, Name = "Мурат", Surname = "Акрапетян", Patronymic = "Абдулович", Adress = "Г.Самара ул. Советская д.16 кв.123", Phone = "89742588532" });
-                UserTable.Add(new UserTableModel() { Id = 4, Name = "Мария", Surname = "Смоленко", Patronymic = "Васильевна", Adress = "Г.Судак ул. Строителей д.12 кв.57", Phone = "89536538431" });
+
+
+                //UserTable.Add(new UserTableModel() { Id = 1, Name = "Василий", Surname = "Пупкин", Patronymic = "Валерьевич", Adress = "Г.Санкт-Петербург ул. Мира д.6 кв.23", Phone = "89535338532" });
+                //UserTable.Add(new UserTableModel() { Id = 2, Name = "Сергей", Surname = "Инанопуло", Patronymic = "Сергеевич", Adress = "Г.Санкт-Петербург ул. Советская д.26 кв.213", Phone = "89535368332" });
+                //UserTable.Add(new UserTableModel() { Id = 3, Name = "Мурат", Surname = "Акрапетян", Patronymic = "Абдулович", Adress = "Г.Самара ул. Советская д.16 кв.123", Phone = "89742588532" });
+                //UserTable.Add(new UserTableModel() { Id = 4, Name = "Мария", Surname = "Смоленко", Patronymic = "Васильевна", Adress = "Г.Судак ул. Строителей д.12 кв.57", Phone = "89536538431" });
                 return true;
             }
             catch (Exception exp)

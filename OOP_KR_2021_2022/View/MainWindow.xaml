@@ -238,11 +238,11 @@
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
-                <DataGridTextColumn Header="Автор" Binding="{Binding Author}"/>
-                <DataGridTextColumn Header="Название" Binding="{Binding Name}"/>
-                <DataGridTextColumn Header="Издательство" Binding="{Binding Publishing_house}"/>
-                <DataGridTextColumn Header="Год издания" Binding="{Binding Year_publishing}"/>
-                <DataGridTextColumn Header="Кол. стр." Binding="{Binding CountPage}"/>
+                <DataGridTextColumn Header="Автор" Binding="{Binding Author}" Width="auto"/>
+                <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="auto"/>
+                <DataGridTextColumn Header="Издательство" Binding="{Binding Publishing_house}" Width="auto"/>
+                <DataGridTextColumn Header="Год издания" Binding="{Binding Year_publishing}" Width="auto"/>
+                <DataGridTextColumn Header="Кол. стр." Binding="{Binding CountPage}" Width="auto"/>
                 <DataGridTextColumn Header="Дата выдачи" Binding="{Binding DateOfIssue, Converter={StaticResource defDateConvert}, UpdateSourceTrigger=PropertyChanged}"/>
                 <DataGridTextColumn Header="Должен сдать" Binding="{Binding DateOfDelivery, Converter={StaticResource defDateConvert}, UpdateSourceTrigger=PropertyChanged}"/>
                 <!--<DataGridTextColumn Header="Кол. экземпляров." Binding="{Binding CountBook}"/>-->
@@ -250,7 +250,7 @@
         </DataGrid>
 
         <DataGrid Grid.Row="1" Grid.Column="1" x:Name="BookGridDist"
-                  ItemsSource="{Binding BookTableDist}" 
+                  ItemsSource="{Binding BookTableDits}" 
                   SelectedItem="{Binding SelectedBookDist, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                   Grid.ColumnSpan="2"
                   EnableRowVirtualization="True"
@@ -263,55 +263,12 @@
                   GridLinesVisibility="None"
                   Visibility="{Binding BookTableDustVisibility, Converter={StaticResource BoolToVis}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   IsSynchronizedWithCurrentItem="True">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectionChanged">
-                    <i:InvokeCommandAction Command="{Binding BookSelectedItemCommand}" CommandParameter="{Binding SelectedBook}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-            <DataGrid.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Отчет о книге" Command="{Binding CreateBookReportCommand}" CommandParameter="{Binding SelectedBook}"/>
-                    <MenuItem Header="Выдача книги читателю" Command="{Binding IssueOfABookCommand}" CommandParameter="{Binding SelectedBook}">
-                        <MenuItem>
-                            <MenuItem.Template>
-                                <ControlTemplate>
-                                    <StackPanel Margin="10 0 10 0" Orientation="Horizontal" DataContext="{StaticResource XNameMainWindow}">
-                                        <TextBlock Text="Выбирете пользователя: " VerticalAlignment="Center"/>
-                                        <ComboBox MinWidth="100" ItemsSource="{Binding UserTable}" VerticalAlignment="Center" SelectionChanged="ComboBox_SelectionChanged">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="SelectionChanged">
-                                                    <i:InvokeCommandAction Command="{Binding CMCBSelectedCommand}" CommandParameter="{Binding SelectedBook}"/>
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                            <ComboBox.ItemTemplate>
-                                                <DataTemplate>
-                                                    <StackPanel Orientation="Horizontal">
-                                                        <TextBlock Text="{Binding Id}"/>
-                                                        <TextBlock Text=" | "/>
-                                                        <TextBlock Text="{Binding Surname}"/>
-                                                        <TextBlock Text=" "/>
-                                                        <TextBlock Text="{Binding Name}"/>
-                                                        <TextBlock Text=" "/>
-                                                        <TextBlock Text="{Binding Patronymic}"/>
-                                                    </StackPanel>
-                                                </DataTemplate>
-                                            </ComboBox.ItemTemplate>
-                                        </ComboBox>
-                                    </StackPanel>
-                                </ControlTemplate>
-                            </MenuItem.Template>
-                        </MenuItem>
-                    </MenuItem>
-                </ContextMenu>
-            </DataGrid.ContextMenu>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
                 <DataGridTextColumn Header="Автор" Binding="{Binding Author}"/>
                 <DataGridTextColumn Header="Название" Binding="{Binding Name}"/>
                 <DataGridTextColumn Header="Издательство" Binding="{Binding Publishing_house}"/>
                 <DataGridTextColumn Header="Год издания" Binding="{Binding Year_publishing}"/>
                 <DataGridTextColumn Header="Кол. стр." Binding="{Binding CountPage}"/>
-                <DataGridTextColumn Header="Кол. экземпляров." Binding="{Binding CountBook}"/>
             </DataGrid.Columns>
         </DataGrid>
 

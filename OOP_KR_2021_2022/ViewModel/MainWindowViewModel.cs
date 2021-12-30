@@ -36,31 +36,8 @@ namespace OOP_KR_2021_2022.ViewModel
             }
         }
 
-        //private DataTable bookTable;
-        //public DataTable BookTable
-        //{
-        //    get => bookTable;
-        //    set
-        //    {
-        //        bookTable = value;
-        //        OnPropertyChanged(nameof(BookTable));
-        //    }
-        //}
-
-        //private DataTable bookTableDits;
-        //public DataTable BookTableDits
-        //{
-        //    get => bookTableDits;
-        //    set
-        //    {
-        //        bookTableDits = value;
-        //        OnPropertyChanged(nameof(BookTableDits));
-        //    }
-        //}
-
-
-        private ObservableCollection<BookTableModel> bookTable;
-        public ObservableCollection<BookTableModel> BookTable
+        private DataTable bookTable;
+        public DataTable BookTable
         {
             get => bookTable;
             set
@@ -70,8 +47,8 @@ namespace OOP_KR_2021_2022.ViewModel
             }
         }
 
-        private ObservableCollection<BookTableModel> bookTableDits;
-        public ObservableCollection<BookTableModel> BookTableDits
+        private DataTable bookTableDits;
+        public DataTable BookTableDits
         {
             get => bookTableDits;
             set
@@ -80,6 +57,29 @@ namespace OOP_KR_2021_2022.ViewModel
                 OnPropertyChanged(nameof(BookTableDits));
             }
         }
+
+
+        //private ObservableCollection<BookTableModel> bookTable;
+        //public ObservableCollection<BookTableModel> BookTable
+        //{
+        //    get => bookTable;
+        //    set
+        //    {
+        //        bookTable = value;
+        //        OnPropertyChanged(nameof(BookTable));
+        //    }
+        //}
+
+        //private ObservableCollection<BookTableModel> bookTableDits;
+        //public ObservableCollection<BookTableModel> BookTableDits
+        //{
+        //    get => bookTableDits;
+        //    set
+        //    {
+        //        bookTableDits = value;
+        //        OnPropertyChanged(nameof(BookTableDits));
+        //    }
+        //}
 
         private ObservableCollection<FilterModel> filter_model;
         public ObservableCollection<FilterModel> Filter_model
@@ -497,7 +497,7 @@ namespace OOP_KR_2021_2022.ViewModel
                     BookTableContains(item, out findName);
                     if (findName == null)
                     {
-                        bookTable.Add(item);
+                        bookTable.Rows.Add(item);
                     }
                 }
             }
@@ -544,7 +544,7 @@ namespace OOP_KR_2021_2022.ViewModel
         private void CreateBooksReportCommandExecute(object obj)
         {
             ReportClass asd = new ReportClass();
-            asd.CreateBooksReport(BookTable);
+            //asd.CreateBooksReport(BookTable.Rows);
         }
         /// <summary>
         /// Поиск книги
@@ -554,7 +554,7 @@ namespace OOP_KR_2021_2022.ViewModel
         /// <returns></returns>
         private bool BookTableContains(BookTableModel ContainsItem, out BookTableModel FindBook)
         {
-            foreach (BookTableModel item in BookTable)
+            foreach (BookTableModel item in BookTable.Rows)
             {
                 if (ContainsItem.Name == item.Name && ContainsItem.Publishing_house == item.Publishing_house && ContainsItem.Year_publishing == item.Year_publishing && ContainsItem.Author == item.Author && ContainsItem.CountPage == item.CountPage)
                 {
@@ -569,7 +569,7 @@ namespace OOP_KR_2021_2022.ViewModel
         public int BookTableCountID()
         {
             int maxId = 0;
-            foreach (BookTableModel item in BookTable)
+            foreach (BookTableModel item in BookTable.Rows)
             {
                 if (item.Id >= maxId) maxId = item.Id + 1;
             }
@@ -587,7 +587,7 @@ namespace OOP_KR_2021_2022.ViewModel
                     int j = _localId;
                     for (; _localId < j + _countBook; _localId++)
                     {
-                        BookTable.Add(new BookTableModel() { Id = _localId, Author = tBAuthor, Name = tBName, CountPage = _countPage, Publishing_house = tBPublishing_house, Year_publishing = _tBYear_publishing });
+                        BookTable.Rows.Add(new BookTableModel() { Id = _localId, Author = tBAuthor, Name = tBName, CountPage = _countPage, Publishing_house = tBPublishing_house, Year_publishing = _tBYear_publishing});
                     }
 
                     ErrorText = "Запись(и) добавленна(ы)!";
@@ -689,91 +689,115 @@ namespace OOP_KR_2021_2022.ViewModel
         private bool StartBookTable()
         {
 
-            //try
-            //{
-            //    //EnableButtonExportCSV = false;
-            //    Task.Run(() =>
-            //    {
-            //        string sql = "SELECT * FROM DATA_TABLE";
-            //        BookTable = new DataTable();
-
-            //        SqlCommand command = new SqlCommand(sql, connection);
-            //        adapter = new SqlDataAdapter(command);
-
-            //        connection.Open();
-            //        adapter.Fill(BookTable);
-            //        OnPropertyChanged(nameof(BookTable));
-            //    });
-            //}
-            //catch (Exception exp)
-            //{
-            //    MessageBox.Show("Ошибка! \n\n" + exp, "Ошибка!");
-            //}
-            //finally
-            //{
-            //    //EnableButtonExportCSV = true;
-            //    if (connection != null)
-            //        connection.Close();
-            //}
-
             try
             {
-                BookTable = new ObservableCollection<BookTableModel>();
-                BookTable.CollectionChanged += ContentCollectionChanged;
-                int i = 1;
-                int j = i;
+                //EnableButtonExportCSV = false;
+                //Task.Run(() =>
+                //{
+                    string sql = "SELECT * FROM BOOKTABLE";
+                    BookTable = new DataTable();
 
-                //new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second)
-                BookTable.Add(new BookTableModel() { Id = i, Author = "Анджей Сапковский", CountPage = 2800, Name = "Ведьмак", Publishing_house = "АТС", Year_publishing = 2020, DateOfIssue = new DateTime(2021, 12, 1, 11, 11, 11), DateOfDelivery = new DateTime(2022, 3, 1, 11, 11, 11) });
-                BookTable.Add(new BookTableModel() { Id = i, Author = "Анджей Сапковский", CountPage = 2800, Name = "Ведьмак", Publishing_house = "АТС", Year_publishing = 2020, DateOfIssue = new DateTime(2021, 11, 14, 11, 11, 11), DateOfDelivery = new DateTime(2022, 2, 14, 11, 11, 11) });
-                for (; i < j+14; i++)
-                {
-                    BookTable.Add(new BookTableModel() { Id = i, Author = "Анджей Сапковский", CountPage = 2800, Name = "Ведьмак", Publishing_house = "АТС", Year_publishing = 2020});
-                }
-                j = i;
-                for (; i < j + 30; i++)
-                {
-                    BookTable.Add(new BookTableModel() { Id = i, Author = "Анджей Сапковский", CountPage = 2800, Name = "Ведьмак", Publishing_house = "АТС", Year_publishing = 2020});
-                }
-                j = i;
-                BookTable.Add(new BookTableModel() { Id = i, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 1", Publishing_house = "Речь", Year_publishing = 2017, DateOfIssue = new DateTime(2021, 11, 14, 11, 11, 11), DateOfDelivery = new DateTime(2022, 2, 14, 11, 11, 11) });
-                BookTable.Add(new BookTableModel() { Id = i, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 1", Publishing_house = "Речь", Year_publishing = 2017, DateOfIssue = new DateTime(2021, 11, 14, 11, 11, 11), DateOfDelivery = new DateTime(2022, 2, 14, 11, 11, 11) });
-                BookTable.Add(new BookTableModel() { Id = i, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 1", Publishing_house = "Речь", Year_publishing = 2017, DateOfIssue = new DateTime(2021, 9, 15, 11, 11, 11), DateOfDelivery = new DateTime(2021, 12, 15, 11, 11, 11) });
-                BookTable.Add(new BookTableModel() { Id = i, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 1", Publishing_house = "Речь", Year_publishing = 2017, DateOfIssue = new DateTime(2021, 9, 28, 11, 11, 11), DateOfDelivery = new DateTime(2021, 12, 28, 11, 11, 11) });
-                for (; i < j + 24; i++)
-                {
-                    BookTable.Add(new BookTableModel() { Id = i, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 1", Publishing_house = "Речь", Year_publishing = 2017});
-                }
-                j = i;
-                for (; i < j + 20; i++)
-                {
-                    BookTable.Add(new BookTableModel() { Id = i, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 2", Publishing_house = "Речь", Year_publishing = 2017});
-                }
-                j = i;
-                for (; i < j + 20; i++)
-                {
-                    BookTable.Add(new BookTableModel() { Id = i, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 3", Publishing_house = "Речь", Year_publishing = 2017});
-                }
-                j = i;
-                for (; i < j + 20; i++)
-                {
-                    BookTable.Add(new BookTableModel() { Id = i, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 4", Publishing_house = "Речь", Year_publishing = 2017});
-                }
+                    SqlCommand command = new SqlCommand(sql, connection);
+                    adapter = new SqlDataAdapter(command);
 
-                //BookTable.Add(new BookTableModel() { Id = 2, Author = "Рэй Брэдбери", CountPage = 320, Name = "Вино из одуванчиков", Publishing_house = "Эксмо-Пресс", Year_publishing = 2021, CountBook = 21 });
-                //BookTable.Add(new BookTableModel() { Id = 3, Author = "Данте Алигьери", CountPage = 352, Name = "Божественная комедия", Publishing_house = "Речь", Year_publishing = 2018, CountBook = 15 });
-                //BookTable.Add(new BookTableModel() { Id = 4, Author = "Джек Лондон", CountPage = 256, Name = "Алая чума", Publishing_house = "АТС", Year_publishing = 2016, CountBook = 27 });
-                //BookTable.Add(new BookTableModel() { Id = 5, Author = "Джек Лондон", CountPage = 2800, Name = "Мартин Иден", Publishing_house = "Издательский дом Мещерякова", Year_publishing = 2018, CountBook = 41 });
-                //BookTable.Add(new BookTableModel() { Id = 6, Author = "Джеффри Николас", CountPage = 352, Name = "Дюна", Publishing_house = "АТС", Year_publishing = 2021, CountBook = 4 });
-                //BookTable.Add(new BookTableModel() { Id = 7, Author = "Эрик Берн", CountPage = 256, Name = "Игры, в которые играют люди", Publishing_house = "Бомбора", Year_publishing = 2017, CountBook = 13 });
-                //BookTable.Add(new BookTableModel() { Id = 8, Author = "Антуан Сент-Экзюпери", CountPage = 160, Name = "Маленький принц", Publishing_house = "Эксмо", Year_publishing = 2011, CountBook = 24 });
-                return true;
+                    connection.Open();
+                    adapter.Fill(BookTable);
+
+
+                //sql = "SELECT DISTINCT Author, name, Publishing_house, Year_publishing, CountPage FROM BOOKTABLE";
+                //BookTableDits = new DataTable();
+
+                //command = new SqlCommand(sql, connection);
+                //adapter = new SqlDataAdapter(command);
+
+                ////connection.Open();
+                //adapter.Fill(BookTableDits);
+
+
+                //DataView view = new DataView(BookTable);
+
+                ////BookTableDits = BookTable.AsEnumerable().Distinct().CopyToDataTable<DataRow>();
+                BookTableDits = BookTable.DefaultView.ToTable(true, "Author", "name", "Publishing_house", "Year_publishing", "CountPage");
+                //BookTableDits = BookTable;
+                //BookTableDits = view.ToTable(true, "Author", "name", "Publishing_house", "Year_publishing", "CountPage");
+                //OnPropertyChanged(nameof(BookTable));
+                //OnPropertyChanged(nameof(BookTableDits));
+
+
+
+                //});
             }
             catch (Exception exp)
             {
-                MessageBox.Show(exp.Message);
+                MessageBox.Show("Ошибка! \n\n" + exp, "Ошибка!");
                 return false;
             }
+            finally
+            {
+                //EnableButtonExportCSV = true;
+                if (connection != null)
+                    connection.Close();
+                
+            }
+            return true;
+            //try
+            //{
+            //    BookTable = new ObservableCollection<BookTableModel>();
+            //    BookTable.CollectionChanged += ContentCollectionChanged;
+            //    int i = 1;
+            //    int j = i;
+
+            //    //new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second)
+            //    BookTable.Add(new BookTableModel() { Id = i, Author = "Анджей Сапковский", CountPage = 2800, Name = "Ведьмак", Publishing_house = "АТС", Year_publishing = 2020, DateOfIssue = new DateTime(2021, 12, 1, 11, 11, 11), DateOfDelivery = new DateTime(2022, 3, 1, 11, 11, 11) });
+            //    BookTable.Add(new BookTableModel() { Id = i, Author = "Анджей Сапковский", CountPage = 2800, Name = "Ведьмак", Publishing_house = "АТС", Year_publishing = 2020, DateOfIssue = new DateTime(2021, 11, 14, 11, 11, 11), DateOfDelivery = new DateTime(2022, 2, 14, 11, 11, 11) });
+            //    for (; i < j+14; i++)
+            //    {
+            //        BookTable.Add(new BookTableModel() { Id = i, Author = "Анджей Сапковский", CountPage = 2800, Name = "Ведьмак", Publishing_house = "АТС", Year_publishing = 2020});
+            //    }
+            //    j = i;
+            //    for (; i < j + 30; i++)
+            //    {
+            //        BookTable.Add(new BookTableModel() { Id = i, Author = "Анджей Сапковский", CountPage = 2800, Name = "Ведьмак", Publishing_house = "АТС", Year_publishing = 2020});
+            //    }
+            //    j = i;
+            //    BookTable.Add(new BookTableModel() { Id = i, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 1", Publishing_house = "Речь", Year_publishing = 2017, DateOfIssue = new DateTime(2021, 11, 14, 11, 11, 11), DateOfDelivery = new DateTime(2022, 2, 14, 11, 11, 11) });
+            //    BookTable.Add(new BookTableModel() { Id = i, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 1", Publishing_house = "Речь", Year_publishing = 2017, DateOfIssue = new DateTime(2021, 11, 14, 11, 11, 11), DateOfDelivery = new DateTime(2022, 2, 14, 11, 11, 11) });
+            //    BookTable.Add(new BookTableModel() { Id = i, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 1", Publishing_house = "Речь", Year_publishing = 2017, DateOfIssue = new DateTime(2021, 9, 15, 11, 11, 11), DateOfDelivery = new DateTime(2021, 12, 15, 11, 11, 11) });
+            //    BookTable.Add(new BookTableModel() { Id = i, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 1", Publishing_house = "Речь", Year_publishing = 2017, DateOfIssue = new DateTime(2021, 9, 28, 11, 11, 11), DateOfDelivery = new DateTime(2021, 12, 28, 11, 11, 11) });
+            //    for (; i < j + 24; i++)
+            //    {
+            //        BookTable.Add(new BookTableModel() { Id = i, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 1", Publishing_house = "Речь", Year_publishing = 2017});
+            //    }
+            //    j = i;
+            //    for (; i < j + 20; i++)
+            //    {
+            //        BookTable.Add(new BookTableModel() { Id = i, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 2", Publishing_house = "Речь", Year_publishing = 2017});
+            //    }
+            //    j = i;
+            //    for (; i < j + 20; i++)
+            //    {
+            //        BookTable.Add(new BookTableModel() { Id = i, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 3", Publishing_house = "Речь", Year_publishing = 2017});
+            //    }
+            //    j = i;
+            //    for (; i < j + 20; i++)
+            //    {
+            //        BookTable.Add(new BookTableModel() { Id = i, Author = "Лев Толстой", CountPage = 368, Name = "Война и мир, том 4", Publishing_house = "Речь", Year_publishing = 2017});
+            //    }
+
+            //    //BookTable.Add(new BookTableModel() { Id = 2, Author = "Рэй Брэдбери", CountPage = 320, Name = "Вино из одуванчиков", Publishing_house = "Эксмо-Пресс", Year_publishing = 2021, CountBook = 21 });
+            //    //BookTable.Add(new BookTableModel() { Id = 3, Author = "Данте Алигьери", CountPage = 352, Name = "Божественная комедия", Publishing_house = "Речь", Year_publishing = 2018, CountBook = 15 });
+            //    //BookTable.Add(new BookTableModel() { Id = 4, Author = "Джек Лондон", CountPage = 256, Name = "Алая чума", Publishing_house = "АТС", Year_publishing = 2016, CountBook = 27 });
+            //    //BookTable.Add(new BookTableModel() { Id = 5, Author = "Джек Лондон", CountPage = 2800, Name = "Мартин Иден", Publishing_house = "Издательский дом Мещерякова", Year_publishing = 2018, CountBook = 41 });
+            //    //BookTable.Add(new BookTableModel() { Id = 6, Author = "Джеффри Николас", CountPage = 352, Name = "Дюна", Publishing_house = "АТС", Year_publishing = 2021, CountBook = 4 });
+            //    //BookTable.Add(new BookTableModel() { Id = 7, Author = "Эрик Берн", CountPage = 256, Name = "Игры, в которые играют люди", Publishing_house = "Бомбора", Year_publishing = 2017, CountBook = 13 });
+            //    //BookTable.Add(new BookTableModel() { Id = 8, Author = "Антуан Сент-Экзюпери", CountPage = 160, Name = "Маленький принц", Publishing_house = "Эксмо", Year_publishing = 2011, CountBook = 24 });
+            //    return true;
+            //}
+            //catch (Exception exp)
+            //{
+            //    MessageBox.Show(exp.Message);
+            //    return false;
+            //}
         }
 
         private bool StartUserTable()

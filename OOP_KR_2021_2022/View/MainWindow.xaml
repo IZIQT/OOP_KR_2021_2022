@@ -9,14 +9,29 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:ViewModel="clr-namespace:OOP_KR_2021_2022.ViewModel"
         xmlns:Converter="clr-namespace:OOP_KR_2021_2022.Common.Convertors"
-        Title="Разработка системы классов для обеспечения работы библиотеки." Height="auto" Width="auto" MinHeight="900" MinWidth="1280">
+        Title="Разработка системы классов для обеспечения работы библиотеки." Height="auto" Width="auto" MinHeight="500" MinWidth="1200">
     <Window.DataContext>
         <ViewModel:MainWindowViewModel/>
     </Window.DataContext>
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <Converter:ColorConverter x:Key="colorConverter"/>
         <ViewModel:MainWindowViewModel x:Key="XNameMainWindow"/>
         <Converter:DefaultDateConverter x:Key="defDateConvert"/>
+
+        <Style TargetType="DataGridCell" x:Key="CellStyle">
+            <Setter Property="Foreground" Value="Blue"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DateOfDelivery}" Value="{x:Null}">
+                    <Setter Property="Foreground" Value="Green"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding DateOfDelivery}" Value="True">
+                    <Setter Property="Foreground" Value="Red"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -209,7 +224,7 @@
                                 <ControlTemplate>
                                     <StackPanel Margin="10 0 10 0" Orientation="Horizontal" >
                                         <TextBlock Text="Выбирете пользователя: " VerticalAlignment="Center"/>
-                                        <ComboBox MinWidth="100" ItemsSource="{Binding UserTable}" VerticalAlignment="Center">
+                                        <ComboBox MinWidth="100" ItemsSource="{Binding UserTable}" VerticalAlignment="Center" SelectedItem="{Binding SelectedUserCombobox}">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="SelectionChanged">
                                                     <i:InvokeCommandAction Command="{Binding CMCBSelectedCommand}" CommandParameter="{Binding SelectedBook}"/>
@@ -234,6 +249,7 @@
                             </MenuItem.Template>
                         </MenuItem>
                     </MenuItem>
+                    <MenuItem Header="Возврат книги" Command="{Binding ReturnOfTheBookCommand}" CommandParameter="{Binding SelectedBook}"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
@@ -243,9 +259,15 @@
                 <DataGridTextColumn Header="Издательство" Binding="{Binding Publishing_house}" Width="auto"/>
                 <DataGridTextColumn Header="Год издания" Binding="{Binding Year_publishing}" Width="auto"/>
                 <DataGridTextColumn Header="Кол. стр." Binding="{Binding CountPage}" Width="auto"/>
-                <DataGridTextColumn Header="Дата выдачи" Binding="{Binding DateOfIssue, Converter={StaticResource defDateConvert}, UpdateSourceTrigger=PropertyChanged}"/>
-                <DataGridTextColumn Header="Должен сдать" Binding="{Binding DateOfDelivery, Converter={StaticResource defDateConvert}, UpdateSourceTrigger=PropertyChanged}"/>
-                <!--<DataGridTextColumn Header="Кол. экземпляров." Binding="{Binding CountBook}"/>-->
+                <DataGridTextColumn Header="ФИО получившего." Binding="{Binding FIO}"/>
+                <DataGridTextColumn Header="Дата выдачи" Binding="{Binding DateOfIssue, ConverterCulture='RU-RU', StringFormat={}{0:D}, Converter={StaticResource defDateConvert}, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTemplateColumn Header="Должен сдать">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding DateOfDelivery, ConverterCulture='RU-RU', StringFormat={}{0:D}, Converter={StaticResource defDateConvert}, UpdateSourceTrigger=PropertyChanged}" Foreground="{Binding DateOfDelivery, Converter={StaticResource colorConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
 
@@ -269,6 +291,7 @@
                 <DataGridTextColumn Header="Издательство" Binding="{Binding Publishing_house}"/>
                 <DataGridTextColumn Header="Год издания" Binding="{Binding Year_publishing}"/>
                 <DataGridTextColumn Header="Кол. стр." Binding="{Binding CountPage}"/>
+                <DataGridTextColumn Header="Кол. штук." Binding="{Binding count}"/>
             </DataGrid.Columns>
         </DataGrid>
 

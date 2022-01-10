@@ -15,10 +15,11 @@ namespace OOP_KR_2021_2022.Model
 {
     class ReportClass
     {
-        public void CreateBookReport(BookTableModel book)
+        public void CreateBookReport(DataRowView book)
         {
             try
             {
+
                 iTextSharp.text.Document doc = new iTextSharp.text.Document();
                 PdfWriter.GetInstance(doc, new FileStream("pdfTables.pdf", FileMode.Create));
                 doc.Open();
@@ -37,16 +38,16 @@ namespace OOP_KR_2021_2022.Model
                 //Сначала добавляем заголовки таблицы
                 cell = new PdfPCell(new Phrase(new Phrase("Название книги", font)));
                 table.AddCell(cell);
-                cell = new PdfPCell(new Phrase(new Phrase(book.Name, font)));
+                cell = new PdfPCell(new Phrase(new Phrase(book.Row.ItemArray[2].ToString(), font)));
                 table.AddCell(cell);
                 table.AddCell(new Phrase("Автор", font));
-                table.AddCell(new Phrase(book.Author, font));
+                table.AddCell(new Phrase(book.Row.ItemArray[1].ToString(), font));
                 table.AddCell(new Phrase("Издание", font));
-                table.AddCell(new Phrase(book.Publishing_house, font));
+                table.AddCell(new Phrase(book.Row.ItemArray[3].ToString(), font));
                 table.AddCell(new Phrase("Год публикации", font));
-                table.AddCell(new Phrase(book.Year_publishing.ToString(), font));
+                table.AddCell(new Phrase(book.Row.ItemArray[4].ToString(), font));
                 table.AddCell(new Phrase("Количество страниц", font));
-                table.AddCell(new Phrase(book.CountPage.ToString(), font));
+                table.AddCell(new Phrase(book.Row.ItemArray[5].ToString(), font));
 
                 table.AddCell(cell);
                 doc.Add(table);
@@ -60,7 +61,7 @@ namespace OOP_KR_2021_2022.Model
             }
         }
 
-        public void CreateBooksReport(ObservableCollection<BookTableModel> books)
+        public void CreateBooksReport(DataRowCollection books)
         {
             try
             {
@@ -89,13 +90,13 @@ namespace OOP_KR_2021_2022.Model
                 table.AddCell(cell);
                 cell = new PdfPCell(new Phrase("Количество страниц", font));
                 table.AddCell(cell);
-                foreach (BookTableModel book in books)
+                foreach (DataRow book in books)
                 {
-                    table.AddCell(new Phrase(book.Name, font));
-                    table.AddCell(new Phrase(book.Author, font));
-                    table.AddCell(new Phrase(book.Publishing_house, font));
-                    table.AddCell(new Phrase(book.Year_publishing.ToString(), font));
-                    table.AddCell(new Phrase(book.CountPage.ToString(), font));
+                    table.AddCell(new Phrase(book.ItemArray[2].ToString(), font));
+                    table.AddCell(new Phrase(book.ItemArray[1].ToString(), font));
+                    table.AddCell(new Phrase(book.ItemArray[3].ToString(), font));
+                    table.AddCell(new Phrase(book.ItemArray[4].ToString(), font));
+                    table.AddCell(new Phrase(book.ItemArray[5].ToString(), font));
                 }
                 doc.Add(table);
                 doc.Close();

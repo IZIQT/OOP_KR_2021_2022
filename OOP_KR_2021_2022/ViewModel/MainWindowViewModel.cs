@@ -25,8 +25,8 @@ namespace OOP_KR_2021_2022.ViewModel
         SqlDataAdapter adapter;
 
         private string FilePath { get; set; }
-        private ObservableCollection<UserTableModel> userTable;
-        public ObservableCollection<UserTableModel> UserTable
+        private DataTable userTable;
+        public DataTable UserTable
         {
             get => userTable;
             set
@@ -92,6 +92,18 @@ namespace OOP_KR_2021_2022.ViewModel
             }
         }
 
+        private object selectedUserCombobox;
+        public object SelectedUserCombobox
+        {
+            get => selectedUserCombobox;
+            set
+            {
+                selectedUserCombobox = value;
+                OnPropertyChanged(nameof(SelectedUserCombobox));
+            }
+        }
+        
+
         private FilterModel selectedContact;
         public FilterModel SelectedContact
         {
@@ -138,8 +150,30 @@ namespace OOP_KR_2021_2022.ViewModel
             }
         }
 
-        private BookTableModel selectedBook;
-        public BookTableModel SelectedBook
+        //private BookTableModel selectedBook;
+        //public BookTableModel SelectedBook
+        //{
+        //    get => selectedBook;
+        //    set
+        //    {
+        //        selectedBook = value;
+        //        OnPropertyChanged(nameof(SelectedBook));
+        //    }
+        //}
+
+        //private BookTableModel selectedBookDist;
+        //public BookTableModel SelectedBookDist
+        //{
+        //    get => selectedBookDist;
+        //    set
+        //    {
+        //        selectedBookDist = value;
+        //        OnPropertyChanged(nameof(SelectedBookDist));
+        //    }
+        //}
+
+        private DataRowView selectedBook;
+        public DataRowView SelectedBook
         {
             get => selectedBook;
             set
@@ -148,7 +182,18 @@ namespace OOP_KR_2021_2022.ViewModel
                 OnPropertyChanged(nameof(SelectedBook));
             }
         }
-        
+
+        private DataRowView selectedBookDist;
+        public DataRowView SelectedBookDist
+        {
+            get => selectedBookDist;
+            set
+            {
+                selectedBookDist = value;
+                OnPropertyChanged(nameof(SelectedBookDist));
+            }
+        }
+
         private string tBAuthor;
         public string TBAuthor
         {
@@ -324,7 +369,7 @@ namespace OOP_KR_2021_2022.ViewModel
                 OnPropertyChanged(nameof(BookTableDustVisibility));
             }
         }
-        
+
         private bool userTableVisibility;
         public bool UserTableVisibility
         {
@@ -346,7 +391,7 @@ namespace OOP_KR_2021_2022.ViewModel
                 OnPropertyChanged(nameof(ErrorText));
             }
         }
-        
+
         public ICommand OrderBookCommand { get; set; }
         public ICommand IssueOfABookCommand { get; set; }
         public ICommand OrderUserCommand { get; set; }
@@ -359,17 +404,18 @@ namespace OOP_KR_2021_2022.ViewModel
         public ICommand CreateBooksReportCommand { get; set; }
         public ICommand LoadingBookFromFileCommand { get; set; }
         public ICommand CMCBSelectedCommand { get; set; }
+        public ICommand ReturnOfTheBookCommand { get; set; }
         public ICommand BookSelectedItemCommand { get; set; }
         public MainWindowViewModel()
         {
-            
+
             if (StartFilter() && StartBookTable() && StartUserTable())
             {
                 UserTableVisibility = false;
                 BookTableVisibility = true;
                 GridAddBook = false;
                 gridAddUser = false;
-                
+
                 OrderBookCommand = new RelayCommand(OrderBookCommandExecute);
                 //IssueOfABookCommand = new RelayCommand(IssueOfABookCommandExecute);
                 OrderUserCommand = new RelayCommand(OrderUserCommandExecute);
@@ -382,11 +428,25 @@ namespace OOP_KR_2021_2022.ViewModel
                 CreateBooksReportCommand = new RelayCommand(CreateBooksReportCommandExecute);
                 LoadingBookFromFileCommand = new RelayCommand(LoadingBookFromFileCommandExecute);
                 CMCBSelectedCommand = new RelayCommand(CMCBSelectedCommandExecute);
+                ReturnOfTheBookCommand = new RelayCommand(ReturnOfTheBookCommandExecute);
                 //BookSelectedItemCommand = new RelayCommand(BookSelectedItemCommandExecute);
             }
             else
             {
                 Application.Current.MainWindow.Close();
+            }
+        }
+
+        private void ReturnOfTheBookCommandExecute(object obj)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sqlExpression = "update BookTable set dateofissue = NULL, dateofdelivery = NULL, userid = NULL where id = '" + (obj as DataRowView).Row.ItemArray[0].ToString() + "'";
+                SqlCommand command = new SqlCommand(sqlExpression, connection);
+                command.ExecuteNonQuery();
+                connection.Close();
+                StartBookTable();
             }
         }
 
@@ -399,25 +459,49 @@ namespace OOP_KR_2021_2022.ViewModel
 
         private void CMCBSelectedCommandExecute(object obj)
         {
-            (obj as BookTableModel).DateOfDelivery = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
-            if (DateTime.Now.Month + 3 < 12)
+            if(SelectedUserCombobox != null)
             {
-                (obj as BookTableModel).DateOfDelivery = new DateTime(DateTime.Now.Year, DateTime.Now.Month+3, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string sqlExpression = "update BookTable set dateofissue = @dateofissue, dateofdelivery = @dateofdelivery, userid = @userid where id = '" + (obj as DataRowView).Row.ItemArray[0].ToString() + "'";
+                    SqlCommand command = new SqlCommand(sqlExpression, connection);
+                    command.Parameters.AddWithValue("@dateofissue", "" + DateTime.Now.Month + '.' + DateTime.Now.Day + '.' + DateTime.Now.Year);
+                    if (DateTime.Now.Month + 3 < 12)
+                    {
+                        command.Parameters.AddWithValue("@dateofdelivery", "" + (DateTime.Now.Month + 3) + '.' + DateTime.Now.Day + '.' + DateTime.Now.Year);
+                    }
+                    else
+                    {
+                        command.Parameters.AddWithValue("@dateofdelivery", "" + (DateTime.Now.Month + 3) % 12 + '.' + DateTime.Now.Day + '.' + (DateTime.Now.Year + 1));
+                    }
+                    command.Parameters.AddWithValue("@userid", (SelectedUserCombobox as DataRowView).Row.ItemArray[0].ToString());
+                    command.ExecuteNonQuery();
+                    connection.Close();
+                    SelectedUserCombobox = null;
+                    StartBookTable();
+                }
             }
-            else
-            {
-                (obj as BookTableModel).DateOfIssue = new DateTime(DateTime.Now.Year+1, (DateTime.Now.Month + 3) % 12, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
-            }
-            
+
+            //(obj as DataRowView).Row.ItemArray[6] = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+            //if (DateTime.Now.Month + 3 < 12)
+            //{
+            //    (obj as DataRowView).Row.ItemArray[7] = new DateTime(DateTime.Now.Year, DateTime.Now.Month + 3, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+            //}
+            //else
+            //{
+            //    (obj as DataRowView).Row.ItemArray[7] = new DateTime(DateTime.Now.Year + 1, (DateTime.Now.Month + 3) % 12, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+            //}
+
             //throw new NotImplementedException();
         }
 
         private int UserTableCountID()
         {
             int maxId = 0;
-            foreach (UserTableModel item in UserTable)
+            foreach (DataRow item in UserTable.Rows)
             {
-                if (item.Id >= maxId) maxId = item.Id + 1;
+                if ((int)item.ItemArray[0] >= maxId) maxId = (int)item.ItemArray[0] + 1;
             }
             return maxId;
         }
@@ -428,17 +512,15 @@ namespace OOP_KR_2021_2022.ViewModel
         /// <param name="ContainsItem">искомый элемент</param>
         /// <param name="FindBook">найденный пользователь</param>
         /// <returns></returns>
-        private bool UserTableContains(UserTableModel ContainsItem, out UserTableModel FindBook)
+        private bool UserTableContains(UserTableModel ContainsItem)
         {
-            foreach (UserTableModel item in UserTable)
+            foreach (DataRow item in UserTable.Rows)
             {
-                if (ContainsItem.Surname == item.Surname && ContainsItem.Name == item.Name && ContainsItem.Patronymic == item.Patronymic && ContainsItem.Adress == item.Adress && ContainsItem.Phone == item.Phone)
+                if (ContainsItem.Surname == item.ItemArray[2].ToString() && ContainsItem.Name == item.ItemArray[1].ToString() && ContainsItem.Patronymic == item.ItemArray[3].ToString() && ContainsItem.Adress == item.ItemArray[4].ToString() && ContainsItem.Phone == item.ItemArray[5].ToString())
                 {
-                    FindBook = item;
                     return true;
                 }
             }
-            FindBook = null;
             return false;
         }
 
@@ -450,26 +532,38 @@ namespace OOP_KR_2021_2022.ViewModel
                 {
 
                     UserTableModel temp = new UserTableModel() { Id = UserTableCountID(), Surname = TBUSurname, Name = TBUName, Patronymic = TBUPatronymic, Phone = TBUPhone, Adress = TBUAdress };
-                    UserTableModel FindUser;
-                    if (UserTableContains(temp, out FindUser))
+                    if (UserTableContains(temp))
                     {
                         ErrorText = "Данный пользователь уже существует в базе!";
                         startTimer();
                     }
                     else
                     {
-                        UserTable.Add(temp);
-                        ErrorText = "Запись добавленна!";
-                        startTimer();
+                        using (SqlConnection connection = new SqlConnection(connectionString))
+                        {
+                            connection.Open();
+                            string sqlExpression = "INSERT INTO UserTable (Name, Surname, Patronymic, Phone, Adress) VALUES (@Name, @Surname, @Patronymic, @Phone, @Adress)";
+                            SqlCommand command = new SqlCommand(sqlExpression, connection);
+                            command.Parameters.AddWithValue("@Name", TBUName);
+                            command.Parameters.AddWithValue("@Surname", TBUSurname);
+                            command.Parameters.AddWithValue("@Patronymic", TBUPatronymic);
+                            command.Parameters.AddWithValue("@Phone", TBUPhone);
+                            command.Parameters.AddWithValue("@Adress", TBUAdress);
+                            command.ExecuteNonQuery();
+                        }
                     }
-
+                    //UserTable.Rows.Add(temp);
+                    connection.Close();
+                    StartUserTable();
+                    ErrorText = "Запись добавленна!";
+                    startTimer();
                 }
-                else
-                {
-                    ErrorText = "Корректно заполните поля!";
-                }
-
             }
+            else
+            {
+                ErrorText = "Корректно заполните поля!";
+            }
+
         }
 
         private bool OpenFileDialog()
@@ -491,14 +585,30 @@ namespace OOP_KR_2021_2022.ViewModel
             if (OpenFileDialog())
             {
                 ObservableCollection<BookTableModel> temp = LBF.LoadingBookFromFile(FilePath);
-                foreach (BookTableModel item in temp)
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    BookTableModel findName;
-                    BookTableContains(item, out findName);
-                    if (findName == null)
+                    connection.Open();
+                    foreach (BookTableModel item in temp)
                     {
-                        bookTable.Rows.Add(item);
+                        //BookTableModel findName;
+                        //BookTableContains(item, out findName);
+                        if (BookTableContains(item))
+                        {
+                            //bookTable.Rows.Add(item);
+
+                            string sqlExpression = "INSERT INTO BookTable (Author, Name, CountPage, Publishing_house, Year_publishing) VALUES (@Author, @Name, @CountPage, @Publishing_house, @Year_publishing)";
+                            SqlCommand command = new SqlCommand(sqlExpression, connection);
+                            command.Parameters.AddWithValue("@Name", item.Name);
+                            command.Parameters.AddWithValue("@Author", item.Author);
+                            command.Parameters.AddWithValue("@CountPage", item.CountPage);
+                            command.Parameters.AddWithValue("@Publishing_house", item.Publishing_house);
+                            command.Parameters.AddWithValue("@Year_publishing", item.Year_publishing);
+                            command.ExecuteNonQuery();
+
+                        }
                     }
+                    connection.Close();
+                    StartBookTable();
                 }
             }
 
@@ -538,40 +648,41 @@ namespace OOP_KR_2021_2022.ViewModel
         private void CreateBookReportCommandExecute(object obj)
         {
             ReportClass asd = new ReportClass();
-            asd.CreateBookReport(obj as BookTableModel);
+            asd.CreateBookReport(obj as DataRowView);
         }
 
         private void CreateBooksReportCommandExecute(object obj)
         {
             ReportClass asd = new ReportClass();
-            //asd.CreateBooksReport(BookTable.Rows);
+            asd.CreateBooksReport(BookTable.Rows);
         }
+
         /// <summary>
         /// Поиск книги
         /// </summary>
         /// <param name="ContainsItem">искомый элемент</param>
         /// <param name="FindBook">Найденая книга</param>
         /// <returns></returns>
-        private bool BookTableContains(BookTableModel ContainsItem, out BookTableModel FindBook)
+        private bool BookTableContains(BookTableModel ContainsItem)
         {
-            foreach (BookTableModel item in BookTable.Rows)
+            foreach (DataRow item in BookTable.Rows)
             {
-                if (ContainsItem.Name == item.Name && ContainsItem.Publishing_house == item.Publishing_house && ContainsItem.Year_publishing == item.Year_publishing && ContainsItem.Author == item.Author && ContainsItem.CountPage == item.CountPage)
+                if (ContainsItem.Name == item.ItemArray[2].ToString() && ContainsItem.Publishing_house == item.ItemArray[3].ToString() && ContainsItem.Year_publishing == (int)item.ItemArray[4] && ContainsItem.Author == item.ItemArray[1].ToString() && ContainsItem.CountPage == (int)item.ItemArray[5])
                 {
-                    FindBook = item;
-                    return true;
+                    //FindBook = item;
+                    return false;
                 }
             }
-            FindBook = null;
-            return false;
+            //FindBook = null;
+            return true;
         }
 
         public int BookTableCountID()
         {
             int maxId = 0;
-            foreach (BookTableModel item in BookTable.Rows)
+            foreach (DataRow item in BookTable.Rows)
             {
-                if (item.Id >= maxId) maxId = item.Id + 1;
+                if ((int)item.ItemArray[0] >= maxId) maxId = (int)item.ItemArray[0] + 1;
             }
             return maxId;
         }
@@ -585,11 +696,36 @@ namespace OOP_KR_2021_2022.ViewModel
                 {
                     int _localId = BookTableCountID();
                     int j = _localId;
-                    for (; _localId < j + _countBook; _localId++)
+                    using (SqlConnection connection = new SqlConnection(connectionString))
                     {
-                        BookTable.Rows.Add(new BookTableModel() { Id = _localId, Author = tBAuthor, Name = tBName, CountPage = _countPage, Publishing_house = tBPublishing_house, Year_publishing = _tBYear_publishing});
-                    }
+                        connection.Open();
+                        for (; _localId < j + _countBook; _localId++)
+                        {
+                            //BookTable.Rows.Add(new BookTableModel() { Id = _localId, Author = tBAuthor, Name = tBName, CountPage = _countPage, Publishing_house = tBPublishing_house, Year_publishing = _tBYear_publishing});
+                            string sqlExpression = "INSERT INTO BookTable (Author, Name, CountPage, Publishing_house, Year_publishing) VALUES (@Author, @Name, @CountPage, @Publishing_house, @Year_publishing)";
+                            //string sqlExpression = "INSERT INTO BookTable (Author, Name, CountPage, Publishing_house, Year_publishing) VALUES ('" + tBAuthor + "', '" + tBName + "', '" + _countPage + "', '" + tBPublishing_house + "', '" + _tBYear_publishing + "')";
+                            SqlCommand command = new SqlCommand(sqlExpression, connection);
+                            command.Parameters.AddWithValue("@Name", tBName);
+                            command.Parameters.AddWithValue("@Author", tBAuthor);
+                            command.Parameters.AddWithValue("@CountPage", _countPage);
+                            command.Parameters.AddWithValue("@Publishing_house", tBPublishing_house);
+                            command.Parameters.AddWithValue("@Year_publishing", _tBYear_publishing);
+                            command.ExecuteNonQuery();
 
+                            //DataRow carRow = BookTable.NewRow();
+                            //carRow["id"] = j;
+                            //carRow["Author"] = tBAuthor;
+                            //carRow["Name"] = tBName;
+                            //carRow["CountPage"] = _countPage;
+                            //carRow["Publishing_house"] = tBPublishing_house;
+                            //carRow["Year_publishing"] = _tBYear_publishing;
+                            //BookTable.Rows.Add(carRow);
+                        }
+
+                    }
+                    if (connection != null)
+                        connection.Close();
+                    StartBookTable();
                     ErrorText = "Запись(и) добавленна(ы)!";
                 }
                 else
@@ -694,8 +830,10 @@ namespace OOP_KR_2021_2022.ViewModel
                 //EnableButtonExportCSV = false;
                 //Task.Run(() =>
                 //{
-                    string sql = "SELECT * FROM BOOKTABLE";
-                    BookTable = new DataTable();
+                //string sql = "SELECT * FROM BOOKTABLE";
+                //string sql = "(SELECT b.*, (SUBSTRING(u.name,1,1)+'.'+SUBSTRING(u.Patronymic,1,1)+'. '+u.surname) as FIO FROM BOOKTABLE b, usertable u where b.Userid = u.id)";
+                string sql = "(SELECT b.*, (SUBSTRING(u.name,1,1)+'.'+SUBSTRING(u.Patronymic,1,1)+'. '+u.surname) as FIO FROM BOOKTABLE b, usertable u where b.Userid = u.id) union all (SELECT b.*, '' as FIO FROM BOOKTABLE b where b.Userid is null)";
+                BookTable = new DataTable();
 
                     SqlCommand command = new SqlCommand(sql, connection);
                     adapter = new SqlDataAdapter(command);
@@ -703,21 +841,21 @@ namespace OOP_KR_2021_2022.ViewModel
                     connection.Open();
                     adapter.Fill(BookTable);
 
-
                 //sql = "SELECT DISTINCT Author, name, Publishing_house, Year_publishing, CountPage FROM BOOKTABLE";
-                //BookTableDits = new DataTable();
+                sql = "SELECT Author, name, Publishing_house, Year_publishing, CountPage, COUNT(*) as count FROM BOOKTABLE bt GROUP BY Author, name, Publishing_house, Year_publishing, CountPage";
+                BookTableDits = new DataTable();
 
-                //command = new SqlCommand(sql, connection);
-                //adapter = new SqlDataAdapter(command);
+                command = new SqlCommand(sql, connection);
+                adapter = new SqlDataAdapter(command);
 
-                ////connection.Open();
-                //adapter.Fill(BookTableDits);
+                //connection.Open();
+                adapter.Fill(BookTableDits);
 
 
                 //DataView view = new DataView(BookTable);
 
                 ////BookTableDits = BookTable.AsEnumerable().Distinct().CopyToDataTable<DataRow>();
-                BookTableDits = BookTable.DefaultView.ToTable(true, "Author", "name", "Publishing_house", "Year_publishing", "CountPage");
+                //BookTableDits = BookTable.DefaultView.ToTable(true, "Author", "name", "Publishing_house", "Year_publishing", "CountPage");
                 //BookTableDits = BookTable;
                 //BookTableDits = view.ToTable(true, "Author", "name", "Publishing_house", "Year_publishing", "CountPage");
                 //OnPropertyChanged(nameof(BookTable));
@@ -802,22 +940,48 @@ namespace OOP_KR_2021_2022.ViewModel
 
         private bool StartUserTable()
         {
+            //try
+            //{
+            //    UserTable = new ObservableCollection<UserTableModel>();
+
+
+            //    //UserTable.Add(new UserTableModel() { Id = 1, Name = "Василий", Surname = "Пупкин", Patronymic = "Валерьевич", Adress = "Г.Санкт-Петербург ул. Мира д.6 кв.23", Phone = "89535338532" });
+            //    //UserTable.Add(new UserTableModel() { Id = 2, Name = "Сергей", Surname = "Инанопуло", Patronymic = "Сергеевич", Adress = "Г.Санкт-Петербург ул. Советская д.26 кв.213", Phone = "89535368332" });
+            //    //UserTable.Add(new UserTableModel() { Id = 3, Name = "Мурат", Surname = "Акрапетян", Patronymic = "Абдулович", Adress = "Г.Самара ул. Советская д.16 кв.123", Phone = "89742588532" });
+            //    //UserTable.Add(new UserTableModel() { Id = 4, Name = "Мария", Surname = "Смоленко", Patronymic = "Васильевна", Adress = "Г.Судак ул. Строителей д.12 кв.57", Phone = "89536538431" });
+            //    return true;
+            //}
+            //catch (Exception exp)
+            //{
+            //    MessageBox.Show(exp.Message);
+            //    return false;
+            //}
+
             try
             {
-                UserTable = new ObservableCollection<UserTableModel>();
+                string sql = "SELECT * FROM UserTable";
+                UserTable = new DataTable();
 
+                SqlCommand command = new SqlCommand(sql, connection);
+                adapter = new SqlDataAdapter(command);
 
-                //UserTable.Add(new UserTableModel() { Id = 1, Name = "Василий", Surname = "Пупкин", Patronymic = "Валерьевич", Adress = "Г.Санкт-Петербург ул. Мира д.6 кв.23", Phone = "89535338532" });
-                //UserTable.Add(new UserTableModel() { Id = 2, Name = "Сергей", Surname = "Инанопуло", Patronymic = "Сергеевич", Adress = "Г.Санкт-Петербург ул. Советская д.26 кв.213", Phone = "89535368332" });
-                //UserTable.Add(new UserTableModel() { Id = 3, Name = "Мурат", Surname = "Акрапетян", Patronymic = "Абдулович", Adress = "Г.Самара ул. Советская д.16 кв.123", Phone = "89742588532" });
-                //UserTable.Add(new UserTableModel() { Id = 4, Name = "Мария", Surname = "Смоленко", Patronymic = "Васильевна", Adress = "Г.Судак ул. Строителей д.12 кв.57", Phone = "89536538431" });
-                return true;
+                connection.Open();
+                adapter.Fill(UserTable);
             }
             catch (Exception exp)
             {
-                MessageBox.Show(exp.Message);
+                MessageBox.Show("Ошибка! \n\n" + exp, "Ошибка!");
                 return false;
             }
+            finally
+            {
+                //EnableButtonExportCSV = true;
+                if (connection != null)
+                    connection.Close();
+                
+            }
+            return true;
+
         }
     }
 }

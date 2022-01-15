@@ -127,23 +127,26 @@ namespace OOP_KR_2021_2022.ViewModel
                 switch (selectedContact.Id)
                 {
                     case 1:
-                        Filter = delegate (object ul)
-                        {
-                            return ((BookTableModel)(ul)).Author.ToUpper().Contains(textSearch.ToUpper()) || ((BookTableModel)(ul)).Name.ToUpper().Contains(textSearch.ToUpper());
-                        };
-                        CollectionViewSource.GetDefaultView(BookTable).Filter = Filter;
+                        BookTable.DefaultView.RowFilter = string.Format("Author LIKE '%{0}%' or Name LIKE '%{0}%'", textSearch.ToUpper());
+                        //Filter = delegate (object ul)
+                        //{
+                        //    return ((DataRow)(ul)).ItemArray[3].ToString().Contains(textSearch.ToUpper()) ;
+                        //};
+                        //CollectionViewSource.GetDefaultView(BookTable.Rows).Filter = Filter;
                         break;
                     case 2:
-                        Filter = delegate (object ul) {
-                            return ((BookTableModel)(ul)).Author.ToUpper().Contains(textSearch.ToUpper());
-                        };
-                        CollectionViewSource.GetDefaultView(BookTable).Filter = Filter;
+                        BookTable.DefaultView.RowFilter = string.Format("Author LIKE '%{0}%'", textSearch.ToUpper());
+                        //Filter = delegate (object ul) {
+                        //    return ((BookTableModel)(ul)).Author.ToUpper().Contains(textSearch.ToUpper());
+                        //};
+                        //CollectionViewSource.GetDefaultView(BookTable).Filter = Filter;
                         break;
                     case 3:
-                        Filter = delegate (object ul) {
-                            return ((BookTableModel)(ul)).Name.ToUpper().Contains(textSearch.ToUpper());
-                        };
-                        CollectionViewSource.GetDefaultView(BookTable).Filter = Filter;
+                        BookTable.DefaultView.RowFilter = string.Format("Name LIKE '%{0}%'", textSearch.ToUpper());
+                        //Filter = delegate (object ul) {
+                        //    return ((BookTableModel)(ul)).Name.ToUpper().Contains(textSearch.ToUpper());
+                        //};
+                        //CollectionViewSource.GetDefaultView(BookTable).Filter = Filter;
                         break;
                 }
                 OnPropertyChanged(nameof(TextSearch));
